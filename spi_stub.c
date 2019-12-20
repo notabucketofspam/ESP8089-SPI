@@ -214,6 +214,11 @@ module_exit(esp_spi_exit);
 #include "esp_sif.h"
 #include "linux/interrupt.h"
 
+#include <linux/delay.h>
+#include <linux/gpio.h>
+#include <linux/module.h>
+#include <linux/moduleparam.h>
+
 struct spi_device_id esp_spi_id[] = { 
   {"esp8089-spi-0", 0 }, 
   {"esp8089-spi-1", 1 },
@@ -231,21 +236,25 @@ MODULE_PARM_DESC(esp_cs0_pin, "ESP8089 CS_0 GPIO number");
 static struct spi_board_info esp_board_spi_devices[] = {
   {
     .modalias  = "esp8089-spi",
-    .bus_num = esp_spi_bus,   //0 or 1
+    .bus_num = 0,   //0 or 1
     .max_speed_hz  = 18*1000*1000,
-    .chip_select   = esp_cs0_pin,/*
+    .chip_select = 0,/*
     .mode   = SPI_MODE_3,
     .controller_data = &spi_test_chip[0],*/
   },
 };
 
 void sif_platform_register_board_info(void) {
+  esp_board_spi_devices[0].bus_num = esp_spi_bus;
+  esp_board_spi_devices[0].chip_select = esp_cs0_pin;
   spi_register_board_info(esp_board_spi_devices, ARRAY_SIZE(esp_board_spi_devices));
 }
 #endif
 
 /* Designed specifically for Raspberry Pi */
-#define GPIO_NO (esp_spi_bus ? 9 : 19) /* MISO1 : MISO2 */
+#define MISO1 9  /* SPI bus 0 */
+#define MISO2 19 /* SPI bus 1 */
+#define GPIO_NO (esp_spi_bus ? MISO1 : MISO2)
 
 int sif_platform_irq_init(void) { 
   int ret;
@@ -293,11 +302,6 @@ void sif_platform_irq_mask(int mask) {
 void sif_platform_target_speed(int high_speed) {
 
 }
-
-#include <linux/delay.h>
-#include <linux/gpio.h>
-#include <linux/module.h>
-#include <linux/moduleparam.h>
 
 static int esp_reset_gpio = 0;
 module_param(esp_reset_gpio, int, 0);
