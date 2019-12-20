@@ -1962,6 +1962,7 @@ static int esp_spi_remove(struct spi_device *spi);
 
 static int esp_spi_probe(struct spi_device *spi) 
 {
+printk("__func__\n");
         int err;
         struct esp_pub *epub;
         struct esp_spi_ctrl *sctrl;
@@ -2355,12 +2356,14 @@ static int __init esp_spi_init(void)
 #ifdef REQUEST_RTC_IRQ
 	request_rtc_irq();
 #endif
+  printk("__func__ err: %d\n", err);
         return err;
 
 _fail:
         esp_wake_unlock();
         esp_wakelock_destroy();
 
+  printk("__func__ err: %d\n", err);
         return err;
 }
 
