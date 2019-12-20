@@ -8,7 +8,7 @@ along with all other requisite tools (make, gcc, etc.).
 ##Hardware
 
 It is recommended to use an ESP-201 module or a barebones ESP-12F module. A 
-development board such as the NodeMCU can cause unpredictable behavior
+development board such as the NodeMCU can cause unpredictable behavior.
 
 Table 1-3. Pin Definitions of HSPI (Slave)
 
