@@ -1,11 +1,11 @@
-#ESP8089-SPI
+# ESP8089-SPI
 
 Linux kernel module to use ESP8089 / ESP8266 over SPI
 
 Intended for use with Raspberry Pi. Make sure that kernel headers are installed,
 along with all other requisite tools (make, gcc, etc.).
 
-##Hardware
+## Hardware
 
 It is recommended to use an ESP-201 module or a barebones ESP-12F module. A 
 development board such as the NodeMCU can cause unpredictable behavior.
@@ -34,7 +34,7 @@ What pins go where:
 
 It may be advisable to add a 33 Ohm resistor across each pin.
 
-##Software
+## Software
 
 `sudo apt-get update`
 
@@ -62,7 +62,7 @@ It may be advisable to add a 33 Ohm resistor across each pin.
 
 `sudo reboot`
 
-##References
+## References
 
 [https://hackaday.io/project/8678-rpi-wifi](https://hackaday.io/project/8678-rpi-wifi)
 
