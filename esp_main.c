@@ -182,6 +182,7 @@ struct esp_fw_blk_hdr {
 #ifndef FPGA_DEBUG
 static int esp_download_fw(struct esp_pub * epub)
 {
+printk("ESP8089 firmware download\n");
 #ifndef HAS_FW
         const struct firmware *fw_entry;
 #endif /* !HAS_FW */
