@@ -1489,6 +1489,7 @@ int sif_spi_write_nosync(struct esp_pub *epub, unsigned char *buf, int len, int 
 
 int sif_spi_protocol_init(struct spi_device *spi)
 {
+printk("__func__\n");
 	unsigned char spi_proto_ini_status = 0;
         unsigned char rx_buf1[10];
         unsigned char tx_buf1[10];
@@ -1891,6 +1892,7 @@ void sif_disable_irq(struct esp_pub *epub)
 
 int esp_setup_spi(struct spi_device *spi)
 {
+printk("__func__\n");
 #ifndef ESP_PREALLOC
 	int retry = 10;
 #endif
@@ -1965,8 +1967,11 @@ static int esp_spi_probe(struct spi_device *spi)
         struct esp_spi_ctrl *sctrl;
 
         esp_dbg(ESP_DBG_ERROR, "%s enter\n", __func__);
-	
+
+/* -------------------------------------------------------------------------- */
+
 	err = esp_setup_spi(spi);
+
 	if (err) {
 		esp_dbg(ESP_DBG_ERROR, "%s setup_spi error[%d]\n", __func__, err);
                 if(sif_sdio_state == ESP_SDIO_STATE_FIRST_INIT)
@@ -1975,7 +1980,11 @@ static int esp_spi_probe(struct spi_device *spi)
 			goto _err_second_init;
 	}
 	esp_dbg(ESP_DBG_ERROR, "%s init_protocol\n", __func__);
+
+/* -------------------------------------------------------------------------- */
+
 	err = sif_spi_protocol_init(spi);
+
 	if(err){
                 if(sif_sdio_state == ESP_SDIO_STATE_FIRST_INIT)
 			goto _err_spi;
@@ -2040,6 +2049,8 @@ static int esp_spi_probe(struct spi_device *spi)
 			goto _err_second_init;
         }
         check_target_id(epub);
+
+/* -------------------------------------------------------------------------- */
 
         err = esp_pub_init_all(epub);
 
