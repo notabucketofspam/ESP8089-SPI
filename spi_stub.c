@@ -213,6 +213,7 @@ module_exit(esp_spi_exit);
 
 #include "esp_sif.h"
 #include "linux/interrupt.h"
+#include "linux/spi/spi.h"
 
 #include <linux/delay.h>
 #include <linux/gpio.h>
@@ -252,9 +253,9 @@ void sif_platform_register_board_info(void) {
 #endif
 
 /* Designed specifically for Raspberry Pi */
-#define MISO1 9  /* SPI bus 0 */
-#define MISO2 19 /* SPI bus 1 */
-#define GPIO_NO (esp_spi_bus ? MISO1 : MISO2)
+#define MISO_0 9  /* SPI bus 0 */
+#define MISO_1 19 /* SPI bus 1 */
+#define GPIO_NO (esp_spi_bus ? MISO_0 : MISO_1)
 
 int sif_platform_irq_init(void) { 
   int ret;
