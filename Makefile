@@ -152,8 +152,7 @@ ifndef DESTDIR
 endif
 	rm -f *.o *.ko .*.cmd *.mod.c *.symvers modules.order
 	rm -rf .tmp_versions
-	mkdir -p -m 755 $(DESTDIR)$(INST_DIR)
-  $(MAKE) modules
+	mkdir -p -m 755 $(DESTDIR)$(INST_DIR); $(MAKE) modules
 	install -m 0644 $(MODULE) $(DESTDIR)$(INST_DIR)
 ifndef DESTDIR
 	-/sbin/depmod -a $(KVERS)
