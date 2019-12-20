@@ -296,6 +296,7 @@ void sif_platform_reset_target(void) {
   gpio_free(esp_reset_gpio);
   mdelay(200);
   gpio_direction_output(esp_mtdo_gpio, 0);
+  mdelay(1000);
 }
 
 void sif_platform_target_poweroff(void) {
