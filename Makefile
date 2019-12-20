@@ -145,4 +145,20 @@ ifndef DESTDIR
 	-/sbin/depmod -a $(KVERS)
 endif
 
+reinstall:
+	rm -f $(DESTDIR)$(INST_DIR)/$(MODULE)
+ifndef DESTDIR
+	-/sbin/depmod -a $(KVERS)
+endif
+	rm -f *.o *.ko .*.cmd *.mod.c *.symvers modules.order
+	rm -rf .tmp_versions
+  config_check $(MODULE)
+	@/sbin/modinfo $(MODULE) | grep -q "^vermagic: *$(KVERS) " || \
+		{ echo "$(MODULE)" is not for Linux $(KVERS); exit 1; }
+	mkdir -p -m 755 $(DESTDIR)$(INST_DIR)
+	install -m 0644 $(MODULE) $(DESTDIR)$(INST_DIR)
+ifndef DESTDIR
+	-/sbin/depmod -a $(KVERS)
+endif
+
 .PHONY: all modules clean install config_check
