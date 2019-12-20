@@ -284,15 +284,15 @@ MODULE_PARM_DESC(esp_mtdo_gpio, "ESP8089 MTDO mode GPIO number");
 
 void sif_platform_reset_target(void) {
   printk("ESP8089 reset via GPIO %d\n", esp_reset_gpio);
-  msleep(200);
+  mdelay(200);
   gpio_request(esp_reset_gpio,"esp_reset");
   gpio_direction_output(esp_reset_gpio, 0);
-  msleep(200);
+  mdelay(200);
   gpio_request(esp_mtdo_gpio,"esp_mtdo");
   gpio_direction_output(esp_mtdo_gpio, 1);
   gpio_direction_input(esp_reset_gpio);
   gpio_free(esp_reset_gpio);
-  msleep(1000);
+  mdelay(1000);
   gpio_direction_input(esp_mtdo_gpio);
   gpio_free(esp_mtdo_gpio);
 }
@@ -307,3 +307,4 @@ void sif_platform_target_poweron(void) {
 
 module_init(esp_spi_init);
 module_exit(esp_spi_exit);
+
