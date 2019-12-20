@@ -2290,7 +2290,7 @@ static int __init esp_spi_init(void)
                 }
 
                 if (/*down_timeout(&esp_powerup_sem,
-                                 msecs_to_jiffies(ESP_WAIT_UP_TIME_MS)) == 0*/1) 
+                    msecs_to_jiffies(ESP_WAIT_UP_TIME_MS)) == 0*/1) 
 		{
 
                         powerup = true;
@@ -2324,8 +2324,9 @@ static int __init esp_spi_init(void)
 
         spi_register_driver(&esp_spi_driver);
 
-        if (down_timeout(&esp_powerup_sem,
-                                 msecs_to_jiffies(ESP_WAIT_UP_TIME_MS)) == 0 && sif_get_ate_config() == 0) {
+        if (/*down_timeout(&esp_powerup_sem,
+            msecs_to_jiffies(ESP_WAIT_UP_TIME_MS)) == 0 && 
+            sif_get_ate_config() == 0*/1) {
 		if(sif_sdio_state == ESP_SDIO_STATE_FIRST_NORMAL_EXIT){
                 	spi_unregister_driver(&esp_spi_driver);
 
