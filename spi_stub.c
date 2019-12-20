@@ -214,6 +214,7 @@ module_exit(esp_spi_exit);
 #include "esp_sif.h"
 #include "linux/interrupt.h"
 #include "linux/spi/spi.h"
+#include "drivers/spi/spi.c"
 
 #include <linux/delay.h>
 #include <linux/gpio.h>
