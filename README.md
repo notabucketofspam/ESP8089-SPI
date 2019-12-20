@@ -46,7 +46,7 @@ It may be advisable to add a 33 Ohm resistor across each pin.
 
 `cd ~/esp`
 
-`git https://github.com/notabucketofspam/ESP8089-SPI.git`
+`git clone https://github.com/notabucketofspam/ESP8089-SPI.git`
 
 `cd ~/esp8089-spi`
 
