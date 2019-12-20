@@ -1,14 +1,14 @@
 # ESP8089-SPI
 
-Linux kernel module to use ESP8089 / ESP8266 over SPI
-
-Intended for use with Raspberry Pi. Make sure that kernel headers are installed,
-along with all other requisite tools (make, gcc, etc.).
+Linux kernel module to use ESP8089 / ESP8266 over SPI. Intended for use with 
+Raspberry Pi Zero.
 
 ## Hardware
 
 It is recommended to use an ESP-201 module or a barebones ESP-12F module. A 
-development board such as the NodeMCU can cause unpredictable behavior.
+development board such as the NodeMCU can cause unpredictable behavior. It may 
+be advisable to add a 33 Ohm resistor across each pin, but this is untested at 
+the moment.
 
 Table 1-3. Pin Definitions of HSPI (Slave)
 
@@ -17,7 +17,7 @@ Table 1-3. Pin Definitions of HSPI (Slave)
 | MTMS     | 9       | IO14 | HSPICLK       |
 | MTDI     | 10      | IO12 | HSPIQ/MISO    |
 | MTCK     | 12      | IO13 | HSPID/MOSI    |
-| MTDO     | 13      | IO15 | HPSICS        |
+| MTDO     | 13      | IO15 | HSPICS        |
 
 What pins go where:
 
@@ -30,19 +30,21 @@ What pins go where:
 | BCM 21       | GPIO14      | SCLK             |
 | BCM 26       | GPIO15      | esp\_mtdo\_gpio  |
 
-\(Yes, you do need two different pins connected to GPIO15\)
-
-It may be advisable to add a 33 Ohm resistor across each pin.
+\(Yes, you do need two different pins connected to GPIO15.\)
 
 ## Software
 
 Start with a fresh install of Raspbian.
+
+#### Step one: prerequisites
 
 `sudo apt-get update`
 
 `sudo apt-get upgrade`
 
 `sudo apt-get install raspberrypi-kernel-headers make gcc`
+
+#### Step two: install
 
 `mkdir ~/esp`
 
@@ -54,6 +56,8 @@ Start with a fresh install of Raspbian.
 
 `sudo make install`
 
+#### Step three: configure
+
 `sudo echo "options esp8089-spi esp_reset_gpio=13 esp_mtdo_gpio=26 esp_cs0_pin=16 esp_spi_bus=1" > /etc/modprobe.d/esp.conf`
 
 `sudo echo " modules-load=esp8089-spi" >> /boot/cmdline.txt`
@@ -63,6 +67,27 @@ Start with a fresh install of Raspbian.
 `sudo echo "dtoverlay=spi1-1cs,cs0_pin=16,cs0_spidev=disabled" >> /boot/config.txt`
 
 `sudo reboot`
+
+## How it works
+
+Please note: I have but a very loose grasp on the underlying mechanics of the
+kernel module at base. 
+
+The ESP8266 is basically just a rehashed ESP8089, which is a wireless chip 
+commonly used in many Unix-based devices. The ESP8089 is designed to load its 
+firmware over SPI / SDIO when the device in question boots, whereas the ESP8266 
+is intended to load firmware off of the integrated SPI flash component. The 
+pins used for this operation, though, are exposed on most varieties of the 
+chip. These pins can be therefore utilized to load any custom firmware onto an 
+ESP8266; in fact, this is what the eagle\_fw\#.h files are.
+
+Upon boot of the host device, the ESP chip is power cycled using the CH\_PD 
+pin \(held low\) and subsequently set to load code over SPI via the MTDO pin 
+\(held high\). Optionally, GPIO0 and GPIO2 can be connected to BCM 26 to ensure 
+the correct boot configuration, but these pins are held high by default by the 
+internal pull-up resistors. Note that, since SPI uses an "active low" 
+configuration for chip select, these pins would have to be be connected with 
+moderately high-value resistors so as not to interfere during normal operation.
 
 ## References
 
