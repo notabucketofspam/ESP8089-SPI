@@ -180,17 +180,6 @@ module_init(esp_spi_init);
 module_exit(esp_spi_exit);
 */
 
-/*
-#define SPI_FREQ 0 // default speed
-#define CMD_RESP_SIZE 1
-#define DATA_RESP_SIZE_R 1
-#define DATA_RESP_SIZE_W 1
-#define BLOCK_R_DATA_RESP_SIZE_1ST 1
-#define BLOCK_R_DATA_RESP_SIZE_EACH 1
-#define BLOCK_W_DATA_RESP_SIZE_EACH 1
-#define BLOCK_W_DATA_RESP_SIZE_FINAL 1
-*/
-
 //#define SPI_FREQ (20000000)                             //  1. 22.5Mhz     2. 45Mhz
 #define SPI_FREQ (30000000)                             //  1. 22.5Mhz     2. 45Mhz
 
@@ -223,27 +212,30 @@ module_exit(esp_spi_exit);
 #endif
 
 #include "esp_sif.h"
+#include "linux/interrupt.h"
 
 struct spi_device_id esp_spi_id[] = { 
   {"esp8089-spi-0", 0 }, 
-  {"esp8089-spi-1", 1 }
+  {"esp8089-spi-1", 1 },
+  {},
 };
 
 static int esp_spi_bus = 0;
 module_param(esp_spi_bus, int, 0);
 MODULE_PARM_DESC(esp_spi_bus, "ESP8089 SPI bus, 0 or 1");
-
 static int esp_cs0_pin = 0;
 module_param(esp_cs0_pin, int, 0);
 MODULE_PARM_DESC(esp_cs0_pin, "ESP8089 CS_0 GPIO number");
 
-#ifdef  REGISTER_SPI_BOARD_INFO
+#ifdef REGISTER_SPI_BOARD_INFO
 static struct spi_board_info esp_board_spi_devices[] = {
   {
     .modalias  = "esp8089-spi",
     .bus_num = esp_spi_bus,   //0 or 1
     .max_speed_hz  = 18*1000*1000,
-    .chip_select   = esp_cs0_pin,
+    .chip_select   = esp_cs0_pin,/*
+    .mode   = SPI_MODE_3,
+    .controller_data = &spi_test_chip[0],*/
   },
 };
 
@@ -252,23 +244,53 @@ void sif_platform_register_board_info(void) {
 }
 #endif
 
+/* Designed specifically for Raspberry Pi */
+#define GPIO_NO (esp_spi_bus ? 9 : 19) /* MISO1 : MISO2 */
+
 int sif_platform_irq_init(void) { 
-  return 0;
+  int ret;
+
+	printk(KERN_ERR "%s enter\n", __func__);
+
+	if ( (ret = gpio_request(GPIO_NO, "esp_spi_int")) != 0) {
+		printk(KERN_ERR "request gpio error\n");
+		return ret;
+	}
+
+	gpio_direction_input(GPIO_NO);
+
+        sif_platform_irq_clear();
+	sif_platform_irq_mask(1);
+
+        udelay(1);
+
+	return 0;
 }
 
 void sif_platform_irq_deinit(void) {
-
+	gpio_free(GPIO_NO);
 }
 
 int sif_platform_get_irq_no(void) { 
-  return -ENXIO;
+	return gpio_to_irq(GPIO_NO);
 } 
 
 int sif_platform_is_irq_occur(void) { 
-  return 0;
+  return 1;
 }
 
-void sif_platform_irq_mask(int enable_mask) {
+void sif_platform_irq_clear(void) {
+
+}
+
+void sif_platform_irq_mask(int mask) {
+	if (mask)
+		disable_irq_nosync(sif_platform_get_irq_no());
+	else
+		enable_irq(sif_platform_get_irq_no());
+}
+
+void sif_platform_target_speed(int high_speed) {
 
 }
 
@@ -306,6 +328,12 @@ void sif_platform_target_poweroff(void) {
 void sif_platform_target_poweron(void) {
   sif_platform_reset_target();
 }
+
+#ifdef ESP_ACK_INTERRUPT
+void sif_platform_ack_interrupt(struct esp_pub *epub) {
+	sif_platform_irq_clear();
+}
+#endif
 
 //module_init(esp_spi_init);
 late_initcall(esp_spi_init);
