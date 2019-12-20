@@ -2281,7 +2281,7 @@ static int __init esp_spi_init(void)
 
 #ifdef DRIVER_VER
         ver = DRIVER_VER;
-        esp_dbg(ESP_SHOW, "\n***** EAGLE DRIVER VER:%llx*****\n\n", ver);
+        esp_dbg(ESP_SHOW, "esp8089_spi: EAGLE DRIVER VER %llx\n", ver);
 #endif
         edf_ret = esp_debugfs_init();
 
@@ -2297,7 +2297,7 @@ static int __init esp_spi_init(void)
 
                 err = spi_register_driver(&esp_spi_dummy_driver);
                 if (err) {
-                        esp_dbg(ESP_DBG_ERROR, "eagle spi driver registration failed, error code: %d\n", err);
+                        esp_dbg(ESP_DBG_ERROR, "esp8089_spi: eagle spi driver registration failed, error code: %d\n", err);
                         goto _fail;
                 }
 
@@ -2310,7 +2310,7 @@ static int __init esp_spi_init(void)
                         break;
                 }
 
-                esp_dbg(ESP_SHOW, "%s ------ RETRY ------ \n", __func__);
+                esp_dbg(ESP_SHOW, "esp8089_spi: %s ------ RETRY ------ \n", __func__);
 
 		sif_record_retry_config();
 
@@ -2321,13 +2321,13 @@ static int __init esp_spi_init(void)
         } while (retry--);
 
         if (!powerup) {
-                esp_dbg(ESP_DBG_ERROR, "eagle spi can not power up!\n");
+                esp_dbg(ESP_DBG_ERROR, "esp8089_spi: eagle spi can not power up!\n");
 
                 err = -ENODEV;
                 goto _fail;
         }
 
-        esp_dbg(ESP_SHOW, "%s power up OK\n", __func__);
+        esp_dbg(ESP_SHOW, "esp8089_spi: %s power up OK\n", __func__);
 
         spi_unregister_driver(&esp_spi_dummy_driver);
 
@@ -2356,14 +2356,14 @@ static int __init esp_spi_init(void)
 #ifdef REQUEST_RTC_IRQ
 	request_rtc_irq();
 #endif
-  printk("__func__ err: %d\n", err);
+  printk("esp8089_spi: %s err %d\n", __func__, err);
         return err;
 
 _fail:
         esp_wake_unlock();
         esp_wakelock_destroy();
 
-  printk("__func__ err: %d\n", err);
+  printk("esp8089_spi: %s err %d\n", __func__, err);
         return err;
 }
 

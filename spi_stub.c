@@ -307,6 +307,7 @@ void sif_platform_target_poweron(void) {
   sif_platform_reset_target();
 }
 
-module_init(esp_spi_init);
+//module_init(esp_spi_init);
+late_initcall(esp_spi_init);
 module_exit(esp_spi_exit);
 
