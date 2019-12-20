@@ -225,8 +225,8 @@ module_exit(esp_spi_exit);
 #include "esp_sif.h"
 
 struct spi_device_id esp_spi_id[] = { 
-  {"esp8089-spi", 0 }, 
-  {}
+  {"esp8089-spi-0", 0 }, 
+  {"esp8089-spi-1", 1 }
 };
 
 static int esp_spi_bus = 0;
@@ -257,6 +257,7 @@ int sif_platform_irq_init(void) {
 }
 
 void sif_platform_irq_deinit(void) {
+
 }
 
 int sif_platform_get_irq_no(void) { 
@@ -268,6 +269,7 @@ int sif_platform_is_irq_occur(void) {
 }
 
 void sif_platform_irq_mask(int enable_mask) {
+
 }
 
 #include <linux/delay.h>
@@ -292,9 +294,8 @@ void sif_platform_reset_target(void) {
   gpio_direction_output(esp_mtdo_gpio, 1);
   gpio_direction_input(esp_reset_gpio);
   gpio_free(esp_reset_gpio);
-  mdelay(1000);
-  gpio_direction_input(esp_mtdo_gpio);
-  gpio_free(esp_mtdo_gpio);
+  mdelay(200);
+  gpio_direction_output(esp_mtdo_gpio, 0);
 }
 
 void sif_platform_target_poweroff(void) {

@@ -212,8 +212,8 @@ static int esp_download_fw(struct esp_pub * epub)
         if (fw_buf == NULL) {
                 return -ENOMEM;
         }
-#else
-
+#else 
+/* This is: ifdef HAS_FW */
 #include "eagle_fw1.h"
 #include "eagle_fw2.h"
 #include "eagle_fw3.h"
