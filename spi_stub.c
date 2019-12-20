@@ -290,17 +290,15 @@ void sif_platform_reset_target(void) {
   msleep(200);
   gpio_request(esp_mtdo_gpio,"esp_mtdo");
   gpio_direction_output(esp_mtdo_gpio, 1);
-  msleep(200);
   gpio_direction_input(esp_reset_gpio);
   gpio_free(esp_reset_gpio);
   msleep(200);
   gpio_direction_input(esp_mtdo_gpio);
   gpio_free(esp_mtdo_gpio);
-  msleep(200);
 }
 
 void sif_platform_target_poweroff(void) {
-  sif_platform_reset_target();
+
 }
 
 void sif_platform_target_poweron(void) {
