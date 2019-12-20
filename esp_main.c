@@ -73,6 +73,7 @@ char *mod_eagle_path_get(void)
 
 int esp_pub_init_all(struct esp_pub *epub)
 {
+printk("__func__\n");
         int ret = 0;
         
 	/* completion for bootup event poll*/
@@ -182,7 +183,7 @@ struct esp_fw_blk_hdr {
 #ifndef FPGA_DEBUG
 static int esp_download_fw(struct esp_pub * epub)
 {
-printk("ESP8089 firmware download\n");
+printk("__func__\n");
 #ifndef HAS_FW
         const struct firmware *fw_entry;
 #endif /* !HAS_FW */
