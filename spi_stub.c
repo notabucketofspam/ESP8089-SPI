@@ -292,7 +292,7 @@ void sif_platform_reset_target(void) {
   gpio_direction_output(esp_mtdo_gpio, 1);
   gpio_direction_input(esp_reset_gpio);
   gpio_free(esp_reset_gpio);
-  msleep(200);
+  msleep(1000);
   gpio_direction_input(esp_mtdo_gpio);
   gpio_free(esp_mtdo_gpio);
 }
