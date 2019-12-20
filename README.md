@@ -36,6 +36,8 @@ It may be advisable to add a 33 Ohm resistor across each pin.
 
 ## Software
 
+Start with a fresh install of Raspbian.
+
 `sudo apt-get update`
 
 `sudo apt-get upgrade`
