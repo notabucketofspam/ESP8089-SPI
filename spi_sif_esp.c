@@ -2275,7 +2275,8 @@ static int __init esp_spi_init(void) {
         esp_dbg(ESP_DBG_TRACE, "%s \n", __func__);
 
 #ifdef REGISTER_SPI_BOARD_INFO
-	sif_platform_register_board_info();
+  static struct spi_device* spi;
+  spi = sif_platform_register_board_info();
 #endif
 
 #ifdef DRIVER_VER
@@ -2326,7 +2327,7 @@ static int __init esp_spi_init(void) {
                 goto _fail;
         }
 
-        esp_dbg(ESP_SHOW, "esp8089_spi: %s power up OK\n", __func__);
+        esp_dbg(ESP_SHOW, "esp8089_spi: ESP8089 power up OK\n");
 
         spi_unregister_driver(&esp_spi_dummy_driver);
 
@@ -2335,8 +2336,7 @@ static int __init esp_spi_init(void) {
 
         spi_register_driver(&esp_spi_driver);
 
-/*
-        if (/*down_timeout(&esp_powerup_sem,
+        if (down_timeout(&esp_powerup_sem,
             msecs_to_jiffies(ESP_WAIT_UP_TIME_MS)) == 0 && 
             sif_get_ate_config() == 0) {
 		if(sif_sdio_state == ESP_SDIO_STATE_FIRST_NORMAL_EXIT){
@@ -2350,7 +2350,7 @@ static int __init esp_spi_init(void) {
 		}
                 
         }
-*/
+
         esp_register_early_suspend();
 	esp_wake_unlock();
 #ifdef REQUEST_RTC_IRQ
@@ -2358,6 +2358,9 @@ static int __init esp_spi_init(void) {
 #endif
 
   printk("esp8089_spi: %s err %d\n", __func__, err);
+
+  err = esp_spi_probe(spi);
+
         return err;
 
 _fail:
