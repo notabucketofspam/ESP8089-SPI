@@ -49,9 +49,11 @@ Start with a fresh install of Raspbian.
 
 #### Step three: configure
 
-`sudo echo "options esp8089-spi esp_reset_gpio=13 esp_mtdo_gpio=26 esp_cs0_pin=16 esp_spi_bus=1" > /etc/modprobe.d/esp.conf`
+`sudo echo "options esp8089-spi esp_reset_gpio=13 esp_mtdo_gpio=26 esp_cs0_pin=16" > /etc/modprobe.d/esp.conf`
 
-`sudo echo "esp8089_spi" > /etc/modprobe.d/blacklist`
+`sudo chmod 777 /etc/modprobe.d/esp.conf`
+
+`sudo echo "esp8089_spi" >> /etc/modprobe.d/blacklist`
 
 `sudo echo "spi_bcm2835" >> /etc/modules`
 
@@ -59,7 +61,7 @@ Start with a fresh install of Raspbian.
 
 `sudo echo "dtparam=spi=on" >> /boot/config.txt`
 
-`sudo echo "dtoverlay=spi1-1cs,cs0_pin=16,cs0_spidev=okay" >> /boot/config.txt`
+`sudo echo "dtoverlay=spi1-1cs,cs0_pin=16,cs0_spidev=disabled" >> /boot/config.txt`
 
 `sudo reboot`
 
