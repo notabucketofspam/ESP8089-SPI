@@ -244,7 +244,7 @@ static struct spi_board_info spi_device_info = {
   .bus_num = 1,
   .chip_select = 0,
   .mode = 2, /* <-- Magic numbers, yay */
-};
+}; /* https://www.raspberrypi.org/forums/viewtopic.php?t=245999 */
 
 struct spi_device* sif_platform_register_board_info(void) {
 
@@ -257,6 +257,7 @@ struct spi_device* sif_platform_register_board_info(void) {
   if( !spi ) {
       printk("esp8089_spi: FAILED to create slave.\n");
     }
+  spi->cs_gpio = esp_cs0_pin;
 
   return spi;
 }
