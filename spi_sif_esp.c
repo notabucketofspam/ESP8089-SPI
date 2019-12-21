@@ -2010,7 +2010,7 @@ static int esp_spi_probe(struct spi_device *spi)
 
 /* -------------------------------------------------------------------------- */
 
-	err = sif_spi_protocol_init(spi);
+	// err = sif_spi_protocol_init(spi);
 
 	if(err) {
     if(sif_sdio_state == ESP_SDIO_STATE_FIRST_INIT)
@@ -2326,14 +2326,13 @@ static int __init esp_spi_init(void) {
                         goto _fail;
                 }
 
-                if (/*down_timeout(&esp_powerup_sem,
-                    msecs_to_jiffies(ESP_WAIT_UP_TIME_MS)) == 0*/1) 
-		{
-
-                        powerup = true;
-			msleep(200);
-                        break;
-                }
+    long long sem_timeout = down_timeout(&esp_powerup_sem, msecs_to_jiffies(ESP_WAIT_UP_TIME_MS));
+//    long long sem_timeout = 0;
+    if (some_number == 0) {
+      powerup = true;
+		  msleep(200);
+      break;
+    }
 
                 esp_dbg(ESP_SHOW, "esp8089_spi: %s ------ RETRY ------ \n", __func__);
 
