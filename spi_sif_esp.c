@@ -198,8 +198,7 @@ int sif_spi_write_raw(struct spi_device *spi, unsigned char* buf, int size)
 	spi_message_init(&msg);
 	spi_message_add_tail(&xfer, &msg);
 	
-//	err = spi_sync_locked(spi, &msg);
-	err = spi_async_locked(spi, &msg);
+	err = spi_sync_locked(spi, &msg);
 
 	if (err) {
 		esp_dbg(ESP_DBG_ERROR, "%s: failed, error: %d\n",
@@ -1906,6 +1905,7 @@ void sif_disable_irq(struct esp_pub *epub)
 
 int esp_setup_spi(struct spi_device *spi)
 {
+int ret;
 #ifndef ESP_PREALLOC
 	int retry = 10;
 #endif
@@ -1950,7 +1950,17 @@ int esp_setup_spi(struct spi_device *spi)
         	spi_resp.block_r_data_resp_size_final = 1000;
 	}
 
-	return 0;
+/* https://www.kernel.org/doc/html/v4.10/driver-api/spi.html */
+/* https://www.kernel.org/doc/Documentation/spi/spi-summary */
+/* https://linux-sunxi.org/SPIdev */
+
+  ret = spi_setup(spi);
+  if( ret ){
+        printk("esp8089_spi: FAILED to setup slave.\n");
+        spi_unregister_device( spi );
+  }
+
+	return ret;
 
 _err_ff_buf:
 	if (check_buf) {

@@ -239,7 +239,7 @@ MODULE_PARM_DESC(esp_cs0_pin, "ESP8089 CS_0 GPIO number");
 #define MAX_SPEED_HZ SPI_FREQ
 
 static struct spi_master *master;
-static struct spi_device *spi_device;
+static struct spi_device *spi;
 
 static struct spi_board_info spi_device_info = {
   .modalias = "esp8089-spi",
@@ -254,9 +254,13 @@ struct spi_device* sif_platform_register_board_info(void) {
 
   master = spi_busnum_to_master( spi_device_info.bus_num );
 
-  spi_device = spi_new_device( master, &spi_device_info );
+  spi = spi_new_device( master, &spi_device_info );
 
-  return spi_device;
+  if( !spi_device ) {
+      printk("esp8089_spi: FAILED to create slave.\n");
+    }
+
+  return spi;
 }
 #endif
 
