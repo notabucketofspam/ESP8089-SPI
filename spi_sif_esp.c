@@ -1993,7 +1993,7 @@ static int esp_spi_probe(struct spi_device *spi)
 
   printk("esp8089_spi: %s\n", __func__);
 
-        //esp_dbg(ESP_DBG_ERROR, "%s enter\n", __func__);
+        //esp_dbg(ESP_DBG_ERROR, "esp8089_spi: %s enter\n", __func__);
 
 /* -------------------------------------------------------------------------- */
 
@@ -2006,7 +2006,7 @@ static int esp_spi_probe(struct spi_device *spi)
 		else
 			goto _err_second_init;
 	}
-	esp_dbg(ESP_DBG_ERROR, "esp8089_spi: %s init_protocol\n", __func__);
+	//esp_dbg(ESP_DBG_ERROR, "esp8089_spi: %s init_protocol\n", __func__);
 
 /* -------------------------------------------------------------------------- */
 
@@ -2330,7 +2330,8 @@ static int __init esp_spi_init(void) {
                 }
 
     sem_timeout = down_timeout(&esp_powerup_sem, msecs_to_jiffies(ESP_WAIT_UP_TIME_MS));
-    if (sem_timeout == 0) {
+    printk("esp8089_spi: sem_timeout = %lld\n", sem_timeout);
+    if (0 == 0) {
       powerup = true;
 		  msleep(200);
       break;
