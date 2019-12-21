@@ -180,8 +180,10 @@ module_init(esp_spi_init);
 module_exit(esp_spi_exit);
 */
 
-//#define SPI_FREQ (20000000)                             //  1. 22.5Mhz     2. 45Mhz
-#define SPI_FREQ (30000000)                             //  1. 22.5Mhz     2. 45Mhz
+#define MHz (1000000)
+
+#define SPI_FREQ (20000000)                             //  1. 22.5Mhz     2. 45Mhz
+//#define SPI_FREQ (30000000)                             //  1. 22.5Mhz     2. 45Mhz
 
 //Below are for spi HZ 22.5M
 #if (SPI_FREQ == 30000000)
@@ -211,8 +213,6 @@ module_exit(esp_spi_exit);
 
 #endif
 
-#define MHz (1000000)
-
 #include "esp_sif.h"
 #include "linux/interrupt.h"
 #include "linux/spi/spi.h"
@@ -233,7 +233,7 @@ MODULE_PARM_DESC(esp_cs0_pin, "ESP8089 CS_0 GPIO number");
 
 #ifdef REGISTER_SPI_BOARD_INFO
 
-#define MAX_SPEED_HZ (10*MHz)
+#define MAX_SPEED_HZ (25*MHz)
 
 static struct spi_master *master;
 static struct spi_device *spi;
