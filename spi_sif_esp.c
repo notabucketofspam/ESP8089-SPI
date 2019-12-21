@@ -2331,7 +2331,7 @@ static int __init esp_spi_init(void) {
 
     sem_timeout = down_timeout(&esp_powerup_sem, msecs_to_jiffies(ESP_WAIT_UP_TIME_MS));
     printk("esp8089_spi: sem_timeout = %lld\n", sem_timeout);
-    if (0 == 0) {
+    if (sem_timeout == 0) {
       powerup = true;
 		  msleep(200);
       break;
