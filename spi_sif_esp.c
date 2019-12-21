@@ -2328,7 +2328,7 @@ static int __init esp_spi_init(void) {
 
     long long sem_timeout = down_timeout(&esp_powerup_sem, msecs_to_jiffies(ESP_WAIT_UP_TIME_MS));
 //    long long sem_timeout = 0;
-    if (some_number == 0) {
+    if (sem_timeout == 0) {
       powerup = true;
 		  msleep(200);
       break;
