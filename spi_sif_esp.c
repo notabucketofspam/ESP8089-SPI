@@ -2296,7 +2296,7 @@ static int __init esp_spi_init(void) {
 #define ESP_WAIT_UP_TIME_MS 11000
         int err;
         u64 ver;
-        int retry = 3;
+        int retry = 12;
         bool powerup = false;
         int edf_ret = 0;
 #ifdef REGISTER_SPI_BOARD_INFO
