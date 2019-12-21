@@ -233,7 +233,7 @@ MODULE_PARM_DESC(esp_cs0_pin, "ESP8089 CS_0 GPIO number");
 
 #ifdef REGISTER_SPI_BOARD_INFO
 
-#define MAX_SPEED_HZ (25*MHz)
+#define MAX_SPEED_HZ (80*MHz)
 
 static struct spi_master *master;
 static struct spi_device *spi;

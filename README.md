@@ -19,6 +19,7 @@ the moment.
 | BCM 19       | GPIO12      | MISO             |
 | BCM 20       | GPIO14      | MOSI             |
 | BCM 21       | GPIO14      | SCLK             |
+| BCM 26       | GPIO15      | N/A              |
 
 ## Software
 
