@@ -2289,6 +2289,8 @@ struct spi_driver esp_spi_dummy_driver = {
 	.remove	= esp_spi_dummy_remove,
 };
 
+#include <linux/delay.h>
+
 static int __init esp_spi_init(void) {
 #define ESP_WAIT_UP_TIME_MS 11000
         int err;
@@ -2300,6 +2302,8 @@ static int __init esp_spi_init(void) {
   static struct spi_device* spi;
 #endif
         esp_dbg(ESP_DBG_TRACE, "%s \n", __func__);
+
+  mdelay(5000);
 
 #ifdef REGISTER_SPI_BOARD_INFO
   spi = sif_platform_register_board_info();
