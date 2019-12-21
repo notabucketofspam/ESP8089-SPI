@@ -263,10 +263,6 @@ struct spi_device* sif_platform_register_board_info(void) {
 }
 #endif
 
-/* Designed specifically for Raspberry Pi */
-#define MISO_0 9  /* SPI bus 0 */
-#define MISO_1 19 /* SPI bus 1 */
-//#define GPIO_NO (esp_spi_bus ? MISO_0 : MISO_1)
 #define GPIO_NO 0
 
 int sif_platform_irq_init(void) { 
@@ -325,6 +321,8 @@ module_param(esp_mtdo_gpio, int, 0);
 MODULE_PARM_DESC(esp_mtdo_gpio, "ESP8089 MTDO mode GPIO number");
 */
 
+static int esp_mtdo_gpio = 26;
+
 void sif_platform_reset_target(void) {
 /*  printk("esp8089_spi: ESP8089 reset via GPIO %d\n", esp_reset_gpio);
   mdelay(200);
@@ -338,12 +336,12 @@ void sif_platform_reset_target(void) {
   mdelay(200);
   gpio_direction_output(esp_mtdo_gpio, 0);
 */
-  gpio_direction_output(esp_cs0_pin, 1);
+  gpio_direction_output(esp_mtdo_gpio, 1);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
-  gpio_direction_output(esp_cs0_pin, 0);
+  gpio_direction_output(esp_mtdo_gpio, 0);
 }
 
 void sif_platform_target_poweroff(void) {
@@ -351,13 +349,13 @@ void sif_platform_target_poweroff(void) {
 }
 
 void sif_platform_target_poweron(void) {
-  gpio_direction_output(esp_cs0_pin, 1);
+  gpio_direction_output(esp_mtdo_gpio, 1);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
-  gpio_direction_output(esp_cs0_pin, 0);
+  gpio_direction_output(esp_mtdo_gpio, 0);
 }
 
 #ifdef ESP_ACK_INTERRUPT

@@ -2010,7 +2010,7 @@ static int esp_spi_probe(struct spi_device *spi)
 
 /* -------------------------------------------------------------------------- */
 
-	// err = sif_spi_protocol_init(spi);
+	err = sif_spi_protocol_init(spi);
 
 	if(err) {
     if(sif_sdio_state == ESP_SDIO_STATE_FIRST_INIT)
