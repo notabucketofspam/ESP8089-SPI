@@ -10,15 +10,6 @@ development board such as the NodeMCU can cause unpredictable behavior. It may
 be advisable to add a 33 Ohm resistor across each pin, but this is untested at 
 the moment.
 
-Table 1-3. Pin Definitions of HSPI (Slave)
-
-| Pin Name | Pin Num | IO   | Function Name |
-| -------- | ------- | ---- | ------------- |
-| MTMS     | 9       | IO14 | HSPICLK       |
-| MTDI     | 10      | IO12 | HSPIQ/MISO    |
-| MTCK     | 12      | IO13 | HSPID/MOSI    |
-| MTDO     | 13      | IO15 | HSPICS        |
-
 What pins go where:
 
 | Raspberry Pi | ESP8089     | Function         |
@@ -42,7 +33,7 @@ Start with a fresh install of Raspbian.
 
 `sudo apt-get upgrade`
 
-`sudo apt-get install raspberrypi-kernel-headers make git`
+`sudo apt-get install raspberrypi-kernel-headers gcc git make`
 
 #### Step two: install
 
@@ -97,9 +88,18 @@ moderately high-value resistors so as not to interfere during normal operation.
 
 [https://github.com/george-hopkins/esp8089-spi](https://github.com/george-hopkins/esp8089-spi)
 
-[https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf](https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf)
-
 [https://static.abstore.pl/design/accounts/soyter/img/dokumentacje/esp8089-driver-release-desc_v1-9-2_english.pdf](https://static.abstore.pl/design/accounts/soyter/img/dokumentacje/esp8089-driver-release-desc_v1-9-2_english.pdf)
 
 [https://pinout.xyz/pinout/spi](https://pinout.xyz/pinout/spi)
+
+[https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf](https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf)
+
+Table 1-3. Pin Definitions of HSPI (Slave)
+
+| Pin Name | Pin Num | IO   | Function Name |
+| -------- | ------- | ---- | ------------- |
+| MTMS     | 9       | IO14 | HSPICLK       |
+| MTDI     | 10      | IO12 | HSPIQ/MISO    |
+| MTCK     | 12      | IO13 | HSPID/MOSI    |
+| MTDO     | 13      | IO15 | HSPICS        |
 
