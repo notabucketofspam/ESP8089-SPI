@@ -61,7 +61,7 @@ Start with a fresh install of Raspbian.
 
 `sudo echo "dtparam=spi=on" >> /boot/config.txt`
 
-`sudo echo "dtoverlay=spi1-1cs,cs0_pin=16,cs0_spidev=disabled" >> /boot/config.txt`
+`sudo echo "dtoverlay=spi1-1cs,cs0_pin=16,cs0_spidev=okay" >> /boot/config.txt`
 
 `sudo reboot`
 
