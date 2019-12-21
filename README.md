@@ -12,14 +12,14 @@ the moment.
 
 #### What pins go where:
 
-| Raspberry Pi | ESP8089     | Function         |
-| ------------ | ----------- | ---------------- |
-| BCM 13       | CH\_PD / EN | esp\_reset\_gpio |
-| BCM 16       | GPIO15      | esp\_cs0\_pin    |
-| BCM 19       | GPIO12      | MISO             |
-| BCM 20       | GPIO14      | MOSI             |
-| BCM 21       | GPIO14      | SCLK             |
-| BCM 26       | GPIO15      | N/A              |
+| Raspberry Pi | ESP8089       | Function         |
+| ------------ | ------------- | ---------------- |
+| BCM 13       | CH\_PD / EN   | esp\_reset\_gpio |
+| BCM 16       | GPIO15        | esp\_cs0\_pin    |
+| BCM 19       | GPIO12        | MISO             |
+| BCM 20       | GPIO14        | MOSI             |
+| BCM 21       | GPIO14        | SCLK             |
+| BCM 26       | GPIO0         | esp\_ack\_int    |
 
 ## Software
 
@@ -47,7 +47,7 @@ Start with a fresh install of Raspbian.
 
 #### Step three: configure
 
-`sudo echo "options esp8089-spi esp_reset_gpio=13 esp_cs0_pin=16" > /etc/modprobe.d/esp.conf`
+`sudo echo "options esp8089-spi esp_reset_gpio=13 esp_cs0_pin=16 esp_ack_int=26" > /etc/modprobe.d/esp.conf`
 
 `sudo echo "esp8089_spi" >> /etc/modprobe.d/blacklist`
 

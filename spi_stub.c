@@ -229,7 +229,7 @@ struct spi_device_id esp_spi_id[] = {
 
 static int esp_cs0_pin = 0;
 module_param(esp_cs0_pin, int, 0);
-MODULE_PARM_DESC(esp_cs0_pin, "ESP8089 CS_0 GPIO number");
+MODULE_PARM_DESC(esp_cs0_pin, "SPI chip select GPIO number");
 
 #ifdef REGISTER_SPI_BOARD_INFO
 
@@ -263,7 +263,11 @@ struct spi_device* sif_platform_register_board_info(void) {
 }
 #endif
 
-#define GPIO_NO 0
+static int esp_ack_int = 0;
+module_param(esp_ack_int, int, 0);
+MODULE_PARM_DESC(esp_ack_int, "Acknowledge interrupt GPIO number");
+
+#define GPIO_NO esp_ack_int
 
 int sif_platform_irq_init(void) { 
   int ret;
@@ -314,14 +318,12 @@ void sif_platform_target_speed(int high_speed) {
 
 static int esp_reset_gpio = 0;
 module_param(esp_reset_gpio, int, 0);
-MODULE_PARM_DESC(esp_reset_gpio, "ESP8089 CH_PD reset GPIO number");
+MODULE_PARM_DESC(esp_reset_gpio, "CH_PD / EN reset GPIO number");
 /*
 static int esp_mtdo_gpio = 0;
 module_param(esp_mtdo_gpio, int, 0);
 MODULE_PARM_DESC(esp_mtdo_gpio, "ESP8089 MTDO mode GPIO number");
 */
-
-static int esp_mtdo_gpio = 26;
 
 void sif_platform_reset_target(void) {
 /*  printk("esp8089_spi: ESP8089 reset via GPIO %d\n", esp_reset_gpio);
@@ -336,12 +338,12 @@ void sif_platform_reset_target(void) {
   mdelay(200);
   gpio_direction_output(esp_mtdo_gpio, 0);
 */
-  gpio_direction_output(esp_mtdo_gpio, 1);
+  gpio_direction_output(esp_cs0_pin, 1);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
-  gpio_direction_output(esp_mtdo_gpio, 0);
+  gpio_direction_output(esp_cs0_pin, 0);
 }
 
 void sif_platform_target_poweroff(void) {
@@ -349,13 +351,13 @@ void sif_platform_target_poweroff(void) {
 }
 
 void sif_platform_target_poweron(void) {
-  gpio_direction_output(esp_mtdo_gpio, 1);
+  gpio_direction_output(esp_cs0_pin, 1);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
-  gpio_direction_output(esp_mtdo_gpio, 0);
+  gpio_direction_output(esp_cs0_pin, 0);
 }
 
 #ifdef ESP_ACK_INTERRUPT
