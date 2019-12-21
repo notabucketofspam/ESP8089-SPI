@@ -42,7 +42,7 @@ Start with a fresh install of Raspbian.
 
 `sudo apt-get upgrade`
 
-`sudo apt-get install raspberrypi-kernel-headers make gcc`
+`sudo apt-get install raspberrypi-kernel-headers make gcc git`
 
 #### Step two: install
 
