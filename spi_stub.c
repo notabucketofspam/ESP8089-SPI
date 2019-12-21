@@ -256,7 +256,7 @@ struct spi_device* sif_platform_register_board_info(void) {
 
   spi = spi_new_device( master, &spi_device_info );
 
-  if( !spi_device ) {
+  if( !spi ) {
       printk("esp8089_spi: FAILED to create slave.\n");
     }
 
