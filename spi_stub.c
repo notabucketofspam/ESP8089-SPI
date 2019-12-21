@@ -244,7 +244,7 @@ static struct spi_device *spi;
 static struct spi_board_info spi_device_info = {
   .modalias = "esp8089-spi",
   .max_speed_hz = MAX_SPEED_HZ,
-  .bus_num = 0,
+  .bus_num = 1,
   .chip_select = 0,
   .mode = SPI_READY,
 };
