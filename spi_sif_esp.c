@@ -1981,7 +1981,7 @@ static int esp_spi_probe(struct spi_device *spi)
 
   printk("esp8089_spi: %s\n", __func__);
 
-        esp_dbg(ESP_DBG_ERROR, "%s enter\n", __func__);
+        // esp_dbg(ESP_DBG_ERROR, "%s enter\n", __func__);
 
 /* -------------------------------------------------------------------------- */
 
