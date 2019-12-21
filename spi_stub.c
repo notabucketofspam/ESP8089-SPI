@@ -227,8 +227,8 @@ struct spi_device_id esp_spi_id[] = {
   {},
 };
 
-static int esp_spi_bus = 0;
-module_param(esp_spi_bus, int, 0);
+static int esp_spi_bus = 1;
+module_param(esp_spi_bus, int, 1);
 MODULE_PARM_DESC(esp_spi_bus, "ESP8089 SPI bus, 0 or 1");
 static int esp_cs0_pin = 0;
 module_param(esp_cs0_pin, int, 0);
@@ -254,7 +254,7 @@ struct spi_device* sif_platform_register_board_info(void) {
 
   master = spi_busnum_to_master( spi_device_info.bus_num );
   if( !master ) {
-      printk("esp8089_spi: FAILED to create master.\n");
+      printk("esp8089_spi: FAILED to find master.\n");
     }
   
   spi = spi_new_device( master, &spi_device_info );
@@ -338,7 +338,6 @@ void sif_platform_reset_target(void) {
   gpio_free(esp_reset_gpio);
   mdelay(200);
   gpio_direction_output(esp_mtdo_gpio, 0);
-  mdelay(1000);
 }
 
 void sif_platform_target_poweroff(void) {

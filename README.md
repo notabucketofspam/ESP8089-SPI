@@ -51,8 +51,6 @@ Start with a fresh install of Raspbian.
 
 `sudo echo "options esp8089-spi esp_reset_gpio=13 esp_mtdo_gpio=26 esp_cs0_pin=16 esp_spi_bus=1" > /etc/modprobe.d/esp.conf`
 
-`sudo echo " modules-load=esp8089-spi" >> /boot/cmdline.txt`
-
 `sudo echo "dtparam=spi=on" >> /boot/config.txt`
 
 `sudo echo "dtoverlay=spi1-1cs,cs0_pin=16,cs0_spidev=disabled" >> /boot/config.txt`
