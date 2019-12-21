@@ -195,9 +195,9 @@ static int esp_download_fw(struct esp_pub * epub)
         struct esp_fw_blk_hdr *bhdr=NULL;
         struct sip_cmd_bootup bootcmd;
 
-#ifndef HAS_FW
-
   printk("esp8089_spi: %s\n", __func__);
+
+#ifndef HAS_FW
 
         if(sif_get_ate_config() == 1) {
 		char * esp_fw_name = ESP_FW_NAME3;
