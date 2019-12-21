@@ -274,12 +274,12 @@ int sif_platform_irq_init(void) {
 
 	printk(KERN_ERR "esp8089_spi: %s enter\n", __func__);
 
-	if ( (ret = gpio_request(GPIO_NO, "esp_spi_int")) != 0) {
+	if ( (ret = gpio_request(esp_ack_int, "esp_spi_int")) != 0) {
 		printk(KERN_ERR "esp8089_spi: request gpio error\n");
 		return ret;
 	}
 
-	gpio_direction_input(GPIO_NO);
+	gpio_direction_input(esp_ack_int);
 
         sif_platform_irq_clear();
 	sif_platform_irq_mask(1);
@@ -290,11 +290,11 @@ int sif_platform_irq_init(void) {
 }
 
 void sif_platform_irq_deinit(void) {
-	gpio_free(GPIO_NO);
+	gpio_free(esp_ack_int);
 }
 
 int sif_platform_get_irq_no(void) { 
-	return gpio_to_irq(GPIO_NO);
+	return gpio_to_irq(esp_ack_int);
 } 
 
 int sif_platform_is_irq_occur(void) { 
