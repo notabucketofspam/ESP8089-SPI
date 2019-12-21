@@ -182,11 +182,11 @@ module_exit(esp_spi_exit);
 
 #define MHz (1000000)
 
-#define SPI_FREQ (20000000)                             //  1. 22.5Mhz     2. 45Mhz
-//#define SPI_FREQ (30000000)                             //  1. 22.5Mhz     2. 45Mhz
+#define SPI_FREQ (20*MHz)                             //  1. 22.5Mhz     2. 45Mhz
+//#define SPI_FREQ (30*MHz)                             //  1. 22.5Mhz     2. 45Mhz
 
 //Below are for spi HZ 22.5M
-#if (SPI_FREQ == 30000000)
+#if (SPI_FREQ == 30*MHz)
 
 #define CMD_RESP_SIZE   (10) //(50)    //Common respon wait time
 #define DATA_RESP_SIZE_W   (142+45) // (1024*13)//   (1024*16)  //(398+400) // (1024*10)    //Only for Write bytes function, data write response.  max:(361+109) 
@@ -198,7 +198,7 @@ module_exit(esp_spi_exit);
 #define BLOCK_R_DATA_RESP_SIZE_1ST   (265)  // (231+75)    //For each data read resp size, in block read  ,max: 134
 #define BLOCK_R_DATA_RESP_SIZE_EACH    (10)  // (20)   //For each data read resp size, in block read 
 
-#elif(SPI_FREQ == 20000000)
+#elif(SPI_FREQ == 20*MHz)
 
 #define CMD_RESP_SIZE (10)    //Common respon wait time
 #define DATA_RESP_SIZE_W (103+40)    //Only for Write bytes function, data write response.  max: 103
