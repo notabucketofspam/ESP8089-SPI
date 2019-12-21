@@ -246,16 +246,18 @@ static struct spi_board_info spi_device_info = {
   .max_speed_hz = MAX_SPEED_HZ,
   .bus_num = 0,
   .chip_select = 0,
-  .mode = 3,
+  .mode = SPI_READY,
 };
 
 struct spi_device* sif_platform_register_board_info(void) {
   spi_device_info.bus_num = esp_spi_bus;
 
   master = spi_busnum_to_master( spi_device_info.bus_num );
-
+  if( !master ) {
+      printk("esp8089_spi: FAILED to create master.\n");
+    }
+  
   spi = spi_new_device( master, &spi_device_info );
-
   if( !spi ) {
       printk("esp8089_spi: FAILED to create slave.\n");
     }
@@ -267,7 +269,8 @@ struct spi_device* sif_platform_register_board_info(void) {
 /* Designed specifically for Raspberry Pi */
 #define MISO_0 9  /* SPI bus 0 */
 #define MISO_1 19 /* SPI bus 1 */
-#define GPIO_NO (esp_spi_bus ? MISO_0 : MISO_1)
+//#define GPIO_NO (esp_spi_bus ? MISO_0 : MISO_1)
+#define GPIO_NO 0
 
 int sif_platform_irq_init(void) { 
   int ret;
