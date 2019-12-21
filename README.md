@@ -19,9 +19,6 @@ the moment.
 | BCM 19       | GPIO12      | MISO             |
 | BCM 20       | GPIO14      | MOSI             |
 | BCM 21       | GPIO14      | SCLK             |
-| BCM 26       | GPIO15      | esp\_mtdo\_gpio  |
-
-\(Yes, you do need two different pins connected to GPIO15.\)
 
 ## Software
 
@@ -49,7 +46,7 @@ Start with a fresh install of Raspbian.
 
 #### Step three: configure
 
-`sudo echo "options esp8089-spi esp_reset_gpio=13 esp_mtdo_gpio=26 esp_cs0_pin=16" > /etc/modprobe.d/esp.conf`
+`sudo echo "options esp8089-spi esp_reset_gpio=13 esp_cs0_pin=16" > /etc/modprobe.d/esp.conf`
 
 `sudo echo "esp8089_spi" >> /etc/modprobe.d/blacklist`
 

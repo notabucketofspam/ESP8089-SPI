@@ -1003,9 +1003,9 @@ int sif_spi_read_bytes(struct spi_device *spi, unsigned int addr,unsigned char *
         esp_dbg(ESP_DBG, "crc rx_data-2  %x\n",rx_cmd[pos+count]);
         esp_dbg(ESP_DBG, "crc rx_data-1  %x\n",rx_cmd[pos+count+1] );
 
-        esp_dbg(ESP_DBG, "crc err\n");
+        esp_dbg(ESP_DBG, "esp8089_spi: crc err\n");
 
-        esp_dbg(ESP_DBG_ERROR, "spierr crc count = %d,addr =%x \n",count,addr);
+        esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr crc count = %d,addr =%x \n",count,addr);
 
         err_ret = -6;
         goto goto_err;
@@ -1095,7 +1095,7 @@ int sif_spi_read_blocks(struct spi_device *spi, unsigned int addr, unsigned char
 
     if(i>=CMD_RESP_SIZE)
     {
-        esp_dbg(ESP_DBG_ERROR, "spierr block read cmd resp 0x00 no recv\n");
+        esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr block read cmd resp 0x00 no recv\n");
 
         err_ret = -3;
         goto goto_err;
@@ -1121,7 +1121,7 @@ int sif_spi_read_blocks(struct spi_device *spi, unsigned int addr, unsigned char
 
     if( find_start_token == 0) 
     {       
-        esp_dbg(ESP_DBG, "1st block read data resp 0xFE no recv,count = %d\n",count);
+        esp_dbg(ESP_DBG, "esp8089_spi: 1st block read data resp 0xFE no recv,count = %d\n",count);
         pos = pos +spi_resp.block_r_data_resp_size_final;
         for(i=0;i< 6+total_num+len-pos;i++)
         {
@@ -1136,7 +1136,7 @@ int sif_spi_read_blocks(struct spi_device *spi, unsigned int addr, unsigned char
 
         timeout = 200;
         do {
-            esp_dbg(ESP_DBG_ERROR, "block read  sleep ,count = %d\n",count);
+            esp_dbg(ESP_DBG_ERROR, "esp8089_spi: block read  sleep ,count = %d\n",count);
             timeout --;
             sif_spi_read_raw(spi, check_buf, 256);
             for(i=0;i<256;i++)
@@ -1152,7 +1152,7 @@ int sif_spi_read_blocks(struct spi_device *spi, unsigned int addr, unsigned char
         if(timeout == 0)
         {
             err_ret = -8;
-            esp_dbg(ESP_DBG_ERROR, "spierr block read start token 0xFE no recv\n");
+            esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr block read start token 0xFE no recv\n");
         }else
         {
             err_ret = -5;
@@ -1176,7 +1176,7 @@ int sif_spi_read_blocks(struct spi_device *spi, unsigned int addr, unsigned char
         esp_dbg(ESP_DBG, "crc rx_data-2  %x\n",rx_cmd[pos+SPI_BLOCK_SIZE]);
         esp_dbg(ESP_DBG, "crc rx_data-1  %x\n",rx_cmd[pos+SPI_BLOCK_SIZE+1] );
 
-        esp_dbg(ESP_DBG_ERROR, "spierr crc err block = 1,count = %d\n",count);
+        esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr crc err block = 1,count = %d\n",count);
 
         err_ret = -6;
         goto goto_err;
@@ -1204,7 +1204,7 @@ int sif_spi_read_blocks(struct spi_device *spi, unsigned int addr, unsigned char
         }
         if(i>=BLOCK_R_DATA_RESP_SIZE_EACH)
         {
-            esp_dbg(ESP_DBG_ERROR, "spierr block%d read data token 0xFE no recv,total:%d\n",j+1,count);
+            esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr block%d read data token 0xFE no recv,total:%d\n",j+1,count);
             err_ret = -7;
             goto goto_err;
         }
@@ -1225,7 +1225,7 @@ int sif_spi_read_blocks(struct spi_device *spi, unsigned int addr, unsigned char
             esp_dbg(ESP_DBG, "crc rx_data-2  %x\n",rx_cmd[pos+SPI_BLOCK_SIZE]);
             esp_dbg(ESP_DBG, "crc rx_data-1  %x\n",rx_cmd[pos+SPI_BLOCK_SIZE+1] );
 
-            esp_dbg(ESP_DBG_ERROR, "spierr crc err,count = %d,block =%d\n",count,j+1);
+            esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr crc err,count = %d,block =%d\n",count,j+1);
  
             err_ret = -6;
             goto goto_err;
@@ -1278,7 +1278,7 @@ int sif_spi_read_mix_nosync(struct spi_device *spi, unsigned int addr, unsigned 
 
 			}while(retry > 0 && err != 0);
 			if(err != 0 && retry == 0)
-				esp_dbg(ESP_DBG_ERROR, "spierr 20 times retry block read fail\n");
+				esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr 20 times retry block read fail\n");
 
 			if(err)
 				return err;
@@ -1296,7 +1296,7 @@ int sif_spi_read_mix_nosync(struct spi_device *spi, unsigned int addr, unsigned 
 				}while(retry >0 && err != 0);
 
 				if(err != 0 &&  retry == 0)
-					esp_dbg(ESP_DBG_ERROR, "spierr 20 times retry byte read fail\n");
+					esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr 20 times retry byte read fail\n");
 			}
 			else
 			{
