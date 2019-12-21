@@ -1892,7 +1892,7 @@ void sif_disable_irq(struct esp_pub *epub)
 
 int esp_setup_spi(struct spi_device *spi)
 {
-printk("__func__\n");
+  printk("esp8089_spi: %s\n", __func__);
 #ifndef ESP_PREALLOC
 	int retry = 10;
 #endif
@@ -1962,7 +1962,7 @@ static int esp_spi_remove(struct spi_device *spi);
 
 static int esp_spi_probe(struct spi_device *spi) 
 {
-printk("__func__\n");
+  printk("esp8089_spi: %s\n", __func__);
         int err;
         struct esp_pub *epub;
         struct esp_spi_ctrl *sctrl;
@@ -2264,8 +2264,7 @@ struct spi_driver esp_spi_dummy_driver = {
 	.remove	= esp_spi_dummy_remove,
 };
 
-static int __init esp_spi_init(void) 
-{
+static int __init esp_spi_init(void) {
 #define ESP_WAIT_UP_TIME_MS 11000
         int err;
         u64 ver;

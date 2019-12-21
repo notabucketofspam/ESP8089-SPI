@@ -214,6 +214,7 @@ module_exit(esp_spi_exit);
 #include "esp_sif.h"
 #include "linux/interrupt.h"
 #include "linux/spi/spi.h"
+#include <linux/init.h>
 
 #include <linux/delay.h>
 #include <linux/gpio.h>
@@ -234,30 +235,25 @@ module_param(esp_cs0_pin, int, 0);
 MODULE_PARM_DESC(esp_cs0_pin, "ESP8089 CS_0 GPIO number");
 
 #ifdef REGISTER_SPI_BOARD_INFO
-#define MAX_SPEED_HZ 18*1000*1000
+#define MAX_SPEED_HZ 3000000
 
-static struct spi_master esp_spi_master = {
-  .num_chipselect = 1,
+static struct spi_master *master;
+static struct spi_device *spi_device;
+
+static struct spi_board_info spi_device_info = {
+  .modalias = "esp8089-spi",
   .max_speed_hz = MAX_SPEED_HZ,
-};
-
-static struct spi_device esp_spi_slave = {
-  .modalias  = "esp8089-spi",
+  .bus_num = 0,
   .chip_select = 0,
-  .max_speed_hz = MAX_SPEED_HZ,
-  .master = &esp_spi_master,
+  .mode = 3,
 };
-
-static int esp_spi_master_cs_gpios[1];
 
 void sif_platform_register_board_info(void) {
-  esp_spi_master.bus_num = esp_spi_bus;
-  esp_spi_master_cs_gpios[0] = esp_cs0_pin;
-  esp_spi_master.cs_gpios = esp_spi_master_cs_gpios;
+  spi_device_info.bus_num = esp_spi_bus;
 
-  esp_spi_slave.cs_gpio = esp_cs0_pin;
+  master = spi_busnum_to_master( spi_device_info.bus_num );
 
-  spi_add_device(&esp_spi_slave);
+  spi_device = spi_new_device( master, &spi_device_info );
 }
 #endif
 
