@@ -2335,8 +2335,9 @@ static int __init esp_spi_init(void) {
 
         spi_register_driver(&esp_spi_driver);
 
+/*
         if (/*down_timeout(&esp_powerup_sem,
-            msecs_to_jiffies(ESP_WAIT_UP_TIME_MS)) == 0*/ 1 && 
+            msecs_to_jiffies(ESP_WAIT_UP_TIME_MS)) == 0 && 
             sif_get_ate_config() == 0) {
 		if(sif_sdio_state == ESP_SDIO_STATE_FIRST_NORMAL_EXIT){
                 	spi_unregister_driver(&esp_spi_driver);
@@ -2349,12 +2350,15 @@ static int __init esp_spi_init(void) {
 		}
                 
         }
-
+*/
         esp_register_early_suspend();
 	esp_wake_unlock();
 #ifdef REQUEST_RTC_IRQ
 	request_rtc_irq();
 #endif
+
+  esp_setup_spi
+
   printk("esp8089_spi: %s err %d\n", __func__, err);
         return err;
 
