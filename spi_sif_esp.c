@@ -151,7 +151,7 @@ int sif_spi_write_then_read(struct spi_device *spi, unsigned char* bufwrite, int
         error = spi_write_then_read(spi, bufwrite,sizesend, bufread, sizeread);
     
 	if (error) {
-		esp_dbg(ESP_DBG_ERROR, "%s: failed, error: %d\n",
+		esp_dbg(ESP_DBG_ERROR, "esp8089_spi: %s: failed, error: %d\n",
 			__func__, error);
 		return error;
 	}
@@ -176,7 +176,7 @@ int sif_spi_write_async_read(struct spi_device *spi, unsigned char* bufwrite,uns
 
 	error = spi_sync_locked(spi, &msg);
 	if (error) {
-		esp_dbg(ESP_DBG_ERROR, "spierr %s: failed, error: %d\n",
+		esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr %s: failed, error: %d\n",
 			__func__, error);
 		return error;
 	}
@@ -201,7 +201,7 @@ int sif_spi_write_raw(struct spi_device *spi, unsigned char* buf, int size)
 	err = spi_sync_locked(spi, &msg);
 
 	if (err) {
-		esp_dbg(ESP_DBG_ERROR, "%s: failed, error: %d\n",
+		esp_dbg(ESP_DBG_ERROR, "esp8089_spi: %s: failed, error: %d\n",
 			__func__, err);
 		return err;
 	}
@@ -316,7 +316,7 @@ int sif_spi_write_bytes(struct spi_device *spi, unsigned int addr, unsigned char
 
     if(i>=CMD_RESP_SIZE)
     {
-        esp_dbg(ESP_DBG_ERROR, "byte write cmd resp 0x00 no recv\n");
+        esp_dbg(ESP_DBG_ERROR, "esp8089_spi: byte write cmd resp 0x00 no recv\n");
         err_ret = -3;
         goto goto_err;
     }
@@ -349,7 +349,7 @@ int sif_spi_write_bytes(struct spi_device *spi, unsigned int addr, unsigned char
     if(i>=spi_resp.data_resp_size_w)
     {
         if(dummymode == 0)
-            esp_dbg(ESP_DBG, "normal byte write data no-busy wait byte 0xff no recv at the first time\n");
+            esp_dbg(ESP_DBG, "esp8089_spi: normal byte write data no-busy wait byte 0xff no recv at the first time\n");
 
         timeout = 200;
         do {
@@ -361,7 +361,7 @@ int sif_spi_write_bytes(struct spi_device *spi, unsigned int addr, unsigned char
 
         if(timeout == 0)
         {
-            esp_dbg(ESP_DBG_ERROR, "spierr byte write data no-busy wait byte 0xff no recv \n"); 
+            esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr byte write data no-busy wait byte 0xff no recv \n"); 
             err_ret = -4;
             goto goto_err;
         }
@@ -472,7 +472,7 @@ int sif_spi_write_blocks(struct spi_device *spi, unsigned int addr,unsigned char
 
         if(i>=CMD_RESP_SIZE)
         {
-            esp_dbg(ESP_DBG_ERROR, "spierr 1st block write cmd resp 0x00 no recv, %d\n", count);
+            esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr 1st block write cmd resp 0x00 no recv, %d\n", count);
             err_ret = -3;
             goto goto_err;
         }
@@ -505,7 +505,7 @@ int sif_spi_write_blocks(struct spi_device *spi, unsigned int addr,unsigned char
                 if(memcmp(tx_cmd+pos+n-4,ff_buf,4) != 0)
                 {
 
-                    esp_dbg(ESP_DBG, "block write  sleep 1\n");
+                    esp_dbg(ESP_DBG, "esp8089_spi: block write  sleep 1\n");
                     if(j == count-1)
                     {
                         timeout = 200;
@@ -519,14 +519,14 @@ int sif_spi_write_blocks(struct spi_device *spi, unsigned int addr,unsigned char
                         if(timeout == 0)
                         {
                             err_ret = -7;
-                            esp_dbg(ESP_DBG_ERROR, "spierr block write data no-busy wait byte 0xff no recv \n"); 
+                            esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr block write data no-busy wait byte 0xff no recv \n"); 
                             goto goto_err;
                         }
                     }
                     else
                     {
                         err_ret = -5;
-                        esp_dbg(ESP_DBG_ERROR, "spierr %s block%d write data not-busy wait error, %d\n", __func__, j+1, count);
+                        esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr %s block%d write data not-busy wait error, %d\n", __func__, j+1, count);
                         goto goto_err;
                     }
                 }
@@ -534,7 +534,7 @@ int sif_spi_write_blocks(struct spi_device *spi, unsigned int addr,unsigned char
             else
             {
                 err_ret = -6;
-                esp_dbg(ESP_DBG_ERROR, "spierr %s block%d write data no data res error, %d\n", __func__, j+1, count);
+                esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr %s block%d write data no data res error, %d\n", __func__, j+1, count);
                 goto goto_err;
             }
 
@@ -586,7 +586,7 @@ int sif_spi_write_blocks(struct spi_device *spi, unsigned int addr,unsigned char
 
         if(i>=CMD_RESP_SIZE)
         {
-            esp_dbg(ESP_DBG_ERROR, "spierr 1st block write cmd resp 0x00 no recv, %d\n", count);
+            esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr 1st block write cmd resp 0x00 no recv, %d\n", count);
             err_ret = -3;
             goto goto_err;
         }
@@ -615,7 +615,7 @@ int sif_spi_write_blocks(struct spi_device *spi, unsigned int addr,unsigned char
             {
                 if(memcmp(tx_cmd+pos+n-4,ff_buf,4) != 0 )
                 {
-                    esp_dbg(ESP_DBG, "block write data during sleep \n"); 
+                    esp_dbg(ESP_DBG, "esp8089_spi: block write data during sleep \n"); 
 
                     if(j == 1)
                     {
@@ -629,14 +629,14 @@ int sif_spi_write_blocks(struct spi_device *spi, unsigned int addr,unsigned char
                         if(timeout == 0)
                         {
                             err_ret = -7;
-                            esp_dbg(ESP_DBG_ERROR, "spierr block write data no-busy wait byte 0xff no recv \n"); 
+                            esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr block write data no-busy wait byte 0xff no recv \n"); 
                             goto goto_err;
                         }
                     }
                     else
                     {
                         err_ret = -5;
-                        esp_dbg(ESP_DBG_ERROR, "spierr %s block%d write data not-busy wait error, %d\n", __func__, j+1, count);
+                        esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr %s block%d write data not-busy wait error, %d\n", __func__, j+1, count);
                         goto goto_err;
                     }
                 }
@@ -644,7 +644,7 @@ int sif_spi_write_blocks(struct spi_device *spi, unsigned int addr,unsigned char
             else
             {
                 err_ret = -6;
-                esp_dbg(ESP_DBG_ERROR, "spierr %s block%d write data no data res error, %d\n", __func__, j+1, count);
+                esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr %s block%d write data no data res error, %d\n", __func__, j+1, count);
                 goto goto_err;
             }
 
@@ -709,14 +709,14 @@ int sif_spi_write_blocks(struct spi_device *spi, unsigned int addr,unsigned char
                 if(memcmp(tx_cmd+pos+n-4,ff_buf,4) != 0)
                 {
                     err_ret = -5;
-                    esp_dbg(ESP_DBG_ERROR, "spierr %s block%d write data not-busy wait error, %d\n", __func__, j+1, count);
+                    esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr %s block%d write data not-busy wait error, %d\n", __func__, j+1, count);
                     goto goto_err;
                 }
             }
             else
             {
                 err_ret = -6;
-                esp_dbg(ESP_DBG_ERROR, "spierr %s block%d write data no data res error, %d\n", __func__, j+1, count);
+                esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr %s block%d write data no data res error, %d\n", __func__, j+1, count);
                 goto goto_err;
             }
 
@@ -897,7 +897,7 @@ int sif_spi_read_bytes(struct spi_device *spi, unsigned int addr,unsigned char *
 
     if(i>=CMD_RESP_SIZE)
     {
-        esp_dbg(ESP_DBG_ERROR, "spierr byte read cmd resp 0x00 no recv\n");
+        esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr byte read cmd resp 0x00 no recv\n");
         /***********error info************************/
         /*
            char t = pos;
@@ -931,14 +931,14 @@ int sif_spi_read_bytes(struct spi_device *spi, unsigned int addr,unsigned char *
         {
             unexp_byte ++;
             if(unexp_byte == 1)
-                esp_dbg(ESP_DBG, " 1 normal byte read not 0xFF or 0xFE  at the first time,count = %d,addr =%x \n",count,addr);
+                esp_dbg(ESP_DBG, "esp8089_spi: 1 normal byte read not 0xFF or 0xFE  at the first time,count = %d,addr =%x \n",count,addr);
         }
     }
 
     if(find_start_token == 0) 
     { 
         if(dummymode == 0)  
-            esp_dbg(ESP_DBG, " normal byte read start token 0xFE  not recv at the first time,count = %d,addr =%x \n",count,addr);
+            esp_dbg(ESP_DBG, "esp8089_spi: normal byte read start token 0xFE  not recv at the first time,count = %d,addr =%x \n",count,addr);
 
         pos = pos +spi_resp.data_resp_size_r;
 
@@ -956,7 +956,7 @@ int sif_spi_read_bytes(struct spi_device *spi, unsigned int addr,unsigned char *
             {
                 unexp_byte ++;
                 if(unexp_byte == 1)
-                    esp_dbg(ESP_DBG, "2 normal byte read not 0xFF or 0xFE  at the first time,count = %d,addr =%x \n",count,addr);
+                    esp_dbg(ESP_DBG, "esp8089_spi: 2 normal byte read not 0xFF or 0xFE  at the first time,count = %d,addr =%x \n",count,addr);
             }
 
         }
@@ -980,7 +980,7 @@ int sif_spi_read_bytes(struct spi_device *spi, unsigned int addr,unsigned char *
 
         if(timeout == 0)
         {
-            esp_dbg(ESP_DBG_ERROR, "spierr byte read start token 0xFE no recv ,count = %d,addr =%x \n",count,addr);
+            esp_dbg(ESP_DBG_ERROR, "esp8089_spi: spierr byte read start token 0xFE no recv ,count = %d,addr =%x \n",count,addr);
         }
         err_ret = -5;
 
@@ -1512,10 +1512,11 @@ int sif_spi_protocol_init(struct spi_device *spi)
                                 tx_buf1[5]=0x95;
                                 //printf("CMD0 \n");
   printk("esp8089_spi: %s, %d\n", __FILE__, __LINE__);
+  printk("esp8089_spi: fail_count = %d\n", fail_count);
                                 sif_spi_write_raw(spi, tx_buf1, 6);
                                 sif_spi_write_async_read(spi,dummy_tx_buf, rx_buf1,10);
-                                          //  esp_dbg(ESP_DBG_ERROR, "rx:[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x]\n", rx_buf1[0],rx_buf1[1]
-             //   ,rx_buf1[2],rx_buf1[3],rx_buf1[4],rx_buf1[5],rx_buf1[6],rx_buf1[7],rx_buf1[8],rx_buf1[9]);
+  esp_dbg(ESP_DBG_ERROR, "rx:[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x]\n", 
+    rx_buf1[0],rx_buf1[1],rx_buf1[2],rx_buf1[3],rx_buf1[4],rx_buf1[5],rx_buf1[6],rx_buf1[7],rx_buf1[8],rx_buf1[9]);
                                 mdelay(100);
 				if(fail_count++ > 10)
 					return -ETIMEDOUT;
@@ -1792,7 +1793,7 @@ int sif_setup_irq_thread(struct spi_device *spi)
 {
 	sif_irq_thread = kthread_run(spi_irq_thread, spi, "kspiirqd/eagle");
 	if (IS_ERR(sif_irq_thread)) {
-		esp_dbg(ESP_DBG_ERROR, "setup irq thread error!\n");
+		esp_dbg(ESP_DBG_ERROR, "esp8089_spi: setup irq thread error!\n");
 		return -1;
 	}
 	return 0;
@@ -1834,7 +1835,7 @@ void sif_enable_irq(struct esp_pub *epub)
 	sif_platform_irq_init();
 	err = sif_setup_irq_thread(spi);
         if (err) {
-                esp_dbg(ESP_DBG_ERROR, "%s setup sif irq failed\n", __func__);
+                esp_dbg(ESP_DBG_ERROR, "esp8089_spi: %s setup sif irq failed\n", __func__);
 		return;
 	}
 
@@ -1857,7 +1858,7 @@ void sif_enable_irq(struct esp_pub *epub)
 #endif /* ESP_IRQ_SHARED */
 
         if (err) {
-                esp_dbg(ESP_DBG_ERROR, "sif %s failed\n", __func__);
+                esp_dbg(ESP_DBG_ERROR, "esp8089_spi: sif %s failed\n", __func__);
 		return ;
 	}
 #ifdef IRQ_WAKE_HOST
@@ -1889,7 +1890,7 @@ void sif_disable_irq(struct esp_pub *epub)
         while (atomic_read(&sctrl->irq_handling)) {
                 schedule_timeout(HZ / 100);
                 if (i++ >= 400) {
-                        esp_dbg(ESP_DBG_ERROR, "%s force to stop irq\n", __func__);
+                        esp_dbg(ESP_DBG_ERROR, "esp8089_spi: %s force to stop irq\n", __func__);
                         break;
                 }
         }
@@ -2005,14 +2006,14 @@ static int esp_spi_probe(struct spi_device *spi)
 		else
 			goto _err_second_init;
 	}
-	esp_dbg(ESP_DBG_ERROR, "%s init_protocol\n", __func__);
+	esp_dbg(ESP_DBG_ERROR, "esp8089_spi: %s init_protocol\n", __func__);
 
 /* -------------------------------------------------------------------------- */
 
 	err = sif_spi_protocol_init(spi);
 
-	if(err){
-                if(sif_sdio_state == ESP_SDIO_STATE_FIRST_INIT)
+	if(err) {
+    if(sif_sdio_state == ESP_SDIO_STATE_FIRST_INIT)
 			goto _err_spi;
 		else
 			goto _err_second_init;
@@ -2090,9 +2091,9 @@ static int esp_spi_probe(struct spi_device *spi)
 			goto _err_second_init;
         }
 
-        esp_dbg(ESP_DBG_TRACE, " %s return  %d\n", __func__, err);
+        esp_dbg(ESP_DBG_TRACE, "esp8089_spi:  %s return  %d\n", __func__, err);
 	if(sif_sdio_state == ESP_SDIO_STATE_FIRST_INIT){
-		esp_dbg(ESP_DBG_ERROR, "first normal exit\n");
+		esp_dbg(ESP_DBG_ERROR, "esp8089_spi: first normal exit\n");
 		sif_sdio_state = ESP_SDIO_STATE_FIRST_NORMAL_EXIT;
 		up(&esp_powerup_sem);
 	}
@@ -2131,7 +2132,7 @@ _err_spi:
 	
 _err_first_init:
 	if(sif_sdio_state == ESP_SDIO_STATE_FIRST_INIT){
-		esp_dbg(ESP_DBG_ERROR, "first error exit\n");
+		esp_dbg(ESP_DBG_ERROR, "esp8089_spi: first error exit\n");
 		sif_sdio_state = ESP_SDIO_STATE_FIRST_ERROR_EXIT;
 		up(&esp_powerup_sem);
 	}
@@ -2146,18 +2147,18 @@ static int esp_spi_remove(struct spi_device *spi)
 {
         struct esp_spi_ctrl *sctrl = NULL;
 
-	esp_dbg(ESP_SHOW, "%s \n", __func__);
+	esp_dbg(ESP_SHOW, "esp8089_spi: %s \n", __func__);
 
         sctrl = spi_get_drvdata(spi);
 
         if (sctrl == NULL) {
-                esp_dbg(ESP_DBG_ERROR, "%s no sctrl\n", __func__);
+                esp_dbg(ESP_DBG_ERROR, "esp8089_spi: %s no sctrl\n", __func__);
                 return -EINVAL;
         }
 
         do {
                 if (sctrl->epub == NULL) {
-                        esp_dbg(ESP_DBG_ERROR, "%s epub null\n", __func__);
+                        esp_dbg(ESP_DBG_ERROR, "esp8089_spi: %s epub null\n", __func__);
                         break;
                 }
 		sctrl->epub->sdio_state = sif_sdio_state;
@@ -2165,7 +2166,7 @@ static int esp_spi_remove(struct spi_device *spi)
                 	if (sctrl->epub->sip) {
                         	sip_detach(sctrl->epub->sip);
                         	sctrl->epub->sip = NULL;
-                        	esp_dbg(ESP_DBG_TRACE, "%s sip detached \n", __func__);
+                        	esp_dbg(ESP_DBG_TRACE, "esp8089_spi: %s sip detached \n", __func__);
                 	}
 #ifdef USE_EXT_GPIO	
 			if (sif_get_ate_config() == 0)
@@ -2182,12 +2183,12 @@ static int esp_spi_remove(struct spi_device *spi)
 #endif /* TEST_MODE */
 		if(sif_sdio_state != ESP_SDIO_STATE_FIRST_NORMAL_EXIT){
                 	esp_pub_dealloc_mac80211(sctrl->epub);
-                	esp_dbg(ESP_DBG_TRACE, "%s dealloc mac80211 \n", __func__);
+                	esp_dbg(ESP_DBG_TRACE, "esp8089_spi: %s dealloc mac80211 \n", __func__);
 			
 			if (sctrl->dma_buffer) {
 				kfree(sctrl->dma_buffer);
 				sctrl->dma_buffer = NULL;
-				esp_dbg(ESP_DBG_TRACE, "%s free dma_buffer \n", __func__);
+				esp_dbg(ESP_DBG_TRACE, "esp8089_spi: %s free dma_buffer \n", __func__);
 			}
 
 			kfree(sctrl);
@@ -2219,7 +2220,7 @@ static int esp_spi_remove(struct spi_device *spi)
         
 	spi_set_drvdata(spi,NULL);
 	
-        esp_dbg(ESP_DBG_TRACE, "eagle spi remove complete\n");
+        esp_dbg(ESP_DBG_TRACE, "esp8089_spi: eagle spi remove complete\n");
 
 	return 0;
 }
@@ -2240,7 +2241,7 @@ static int esp_spi_suspend(struct device *dev)
 
 static int esp_spi_resume(struct device *dev)
 {
-        esp_dbg(ESP_DBG_ERROR, "%s", __func__);
+        esp_dbg(ESP_DBG_ERROR, "esp8089_spi: %s", __func__);
 
         return 0;
 }
@@ -2266,7 +2267,7 @@ struct spi_driver esp_spi_driver = {
 
 static int esp_spi_dummy_probe(struct spi_device *spi)
 {
-        esp_dbg(ESP_DBG_ERROR, "%s enter\n", __func__);
+        esp_dbg(ESP_DBG_ERROR, "esp8089_spi: %s enter\n", __func__);
 
         up(&esp_powerup_sem);
         
@@ -2301,7 +2302,7 @@ static int __init esp_spi_init(void) {
 #ifdef REGISTER_SPI_BOARD_INFO
   static struct spi_device* spi;
 #endif
-        esp_dbg(ESP_DBG_TRACE, "%s \n", __func__);
+        esp_dbg(ESP_DBG_TRACE, "esp8089_spi: %s \n", __func__);
 
 #ifdef DRIVER_VER
         ver = DRIVER_VER;
@@ -2385,9 +2386,10 @@ static int __init esp_spi_init(void) {
 
 #ifdef REGISTER_SPI_BOARD_INFO
   spi = sif_platform_register_board_info();
-  if (spi)
+  if (spi) {
+    printk("esp8089_spi: register board OK\n");
     err = esp_spi_probe(spi);
-  else
+  } else
     printk("esp8089_spi: No slave to probe\n");
 #endif
         return err;
@@ -2402,7 +2404,7 @@ _fail:
 
 static void __exit esp_spi_exit(void) 
 {
-	esp_dbg(ESP_SHOW, "%s \n", __func__);
+	esp_dbg(ESP_SHOW, "esp8089_spi: %s \n", __func__);
 
 	esp_debugfs_exit();
 	
