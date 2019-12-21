@@ -250,7 +250,7 @@ static struct spi_board_info spi_device_info = {
 };
 
 struct spi_device* sif_platform_register_board_info(void) {
-//  spi_device_info.bus_num = esp_spi_bus;
+  spi_device_info.bus_num = esp_spi_bus;
 
   master = spi_busnum_to_master( spi_device_info.bus_num );
   if( !master ) {

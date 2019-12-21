@@ -2303,12 +2303,6 @@ static int __init esp_spi_init(void) {
 #endif
         esp_dbg(ESP_DBG_TRACE, "%s \n", __func__);
 
-  mdelay(5000);
-
-#ifdef REGISTER_SPI_BOARD_INFO
-  spi = sif_platform_register_board_info();
-#endif
-
 #ifdef DRIVER_VER
         ver = DRIVER_VER;
         esp_dbg(ESP_SHOW, "esp8089_spi: EAGLE DRIVER VER %llx\n", ver);
@@ -2390,7 +2384,11 @@ static int __init esp_spi_init(void) {
   printk("esp8089_spi: %s err %d\n", __func__, err);
 
 #ifdef REGISTER_SPI_BOARD_INFO
-  err = esp_spi_probe(spi);
+  spi = sif_platform_register_board_info();
+  if (spi)
+    err = esp_spi_probe(spi);
+  else
+    printk("esp8089_spi: No slave to probe\n");
 #endif
         return err;
 
