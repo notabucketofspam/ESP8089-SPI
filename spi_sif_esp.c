@@ -2327,8 +2327,8 @@ static int __init esp_spi_init(void) {
                         goto _fail;
                 }
 
-                if (down_timeout(&esp_powerup_sem,
-                    msecs_to_jiffies(ESP_WAIT_UP_TIME_MS)) == 0) 
+                if (/*down_timeout(&esp_powerup_sem,
+                    msecs_to_jiffies(ESP_WAIT_UP_TIME_MS)) == 0*/1) 
 		{
 
                         powerup = true;
