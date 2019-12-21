@@ -211,6 +211,8 @@ module_exit(esp_spi_exit);
 
 #endif
 
+#define MHz 000000
+
 #include "esp_sif.h"
 #include "linux/interrupt.h"
 #include "linux/spi/spi.h"
@@ -231,7 +233,7 @@ MODULE_PARM_DESC(esp_cs0_pin, "ESP8089 CS_0 GPIO number");
 
 #ifdef REGISTER_SPI_BOARD_INFO
 
-#define MAX_SPEED_HZ SPI_FREQ
+#define MAX_SPEED_HZ (10MHz)
 
 static struct spi_master *master;
 static struct spi_device *spi;
@@ -241,7 +243,7 @@ static struct spi_board_info spi_device_info = {
   .max_speed_hz = MAX_SPEED_HZ,
   .bus_num = 1,
   .chip_select = 0,
-  .mode = 2,
+  .mode = 2, /* <-- Magic numbers, yay */
 };
 
 struct spi_device* sif_platform_register_board_info(void) {
@@ -269,10 +271,10 @@ struct spi_device* sif_platform_register_board_info(void) {
 int sif_platform_irq_init(void) { 
   int ret;
 
-	printk(KERN_ERR "%s enter\n", __func__);
+	printk(KERN_ERR "esp8089_spi: %s enter\n", __func__);
 
 	if ( (ret = gpio_request(GPIO_NO, "esp_spi_int")) != 0) {
-		printk(KERN_ERR "request gpio error\n");
+		printk(KERN_ERR "esp8089_spi: request gpio error\n");
 		return ret;
 	}
 
