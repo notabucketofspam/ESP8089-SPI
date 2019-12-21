@@ -225,6 +225,8 @@ module_exit(esp_spi_exit);
 
 struct spi_device_id esp_spi_id[] = { 
   {"esp8089_spi_0", 0 },
+  {"esp_spi_1", 1},
+  {},
 };
 
 static int esp_cs0_pin = 0;
@@ -339,11 +341,13 @@ void sif_platform_reset_target(void) {
   gpio_direction_output(esp_mtdo_gpio, 0);
 */
   gpio_direction_output(esp_cs0_pin, 1);
+  gpio_direction_output(esp_ack_int, 0);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
   gpio_direction_output(esp_cs0_pin, 0);
+  gpio_direction_input(esp_ack_int);
 }
 
 void sif_platform_target_poweroff(void) {
@@ -352,12 +356,14 @@ void sif_platform_target_poweroff(void) {
 
 void sif_platform_target_poweron(void) {
   gpio_direction_output(esp_cs0_pin, 1);
+  gpio_direction_output(esp_ack_int, 0);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
   gpio_direction_output(esp_cs0_pin, 0);
+  gpio_direction_input(esp_ack_int);
 }
 
 #ifdef ESP_ACK_INTERRUPT

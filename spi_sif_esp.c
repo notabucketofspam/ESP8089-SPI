@@ -2296,38 +2296,47 @@ static int __init esp_spi_init(void) {
 #define ESP_WAIT_UP_TIME_MS 11000
         int err;
         u64 ver;
-        int retry = 12;
+        int retry = 3;
         bool powerup = false;
         int edf_ret = 0;
-#ifdef REGISTER_SPI_BOARD_INFO
-  static struct spi_device* spi;
-#endif
 
   long long sem_timeout = 0;
   
+#ifdef REGISTER_SPI_BOARD_INFO
+  static struct spi_device* spi = sif_platform_register_board_info();
+  if (spi) 
+    printk("esp8089_spi: register board OK\n");
+#endif
+
         esp_dbg(ESP_DBG_TRACE, "esp8089_spi: %s \n", __func__);
 
 #ifdef DRIVER_VER
         ver = DRIVER_VER;
         esp_dbg(ESP_SHOW, "esp8089_spi: EAGLE DRIVER VER %llx\n", ver);
 #endif
-        edf_ret = esp_debugfs_init();
+
+  edf_ret = esp_debugfs_init();
 
 	request_init_conf();
 
-        esp_wakelock_init();
-        esp_wake_lock();
+  esp_wakelock_init();
+  esp_wake_lock();
 
-        do {
-                sema_init(&esp_powerup_sem, 0);
+  do {
+    sema_init(&esp_powerup_sem, 0);
+    sif_platform_target_poweron();
+    err = spi_register_driver(&esp_spi_dummy_driver);
 
-                sif_platform_target_poweron();
+    if (err) {
+      esp_dbg(ESP_DBG_ERROR, "esp8089_spi: eagle spi driver registration failed, error code: %d\n", err);
+      goto _fail;
+    }
 
-                err = spi_register_driver(&esp_spi_dummy_driver);
-                if (err) {
-                        esp_dbg(ESP_DBG_ERROR, "esp8089_spi: eagle spi driver registration failed, error code: %d\n", err);
-                        goto _fail;
-                }
+    err = esp_spi_dummy_probe(spi);
+    if (err) {
+      printk("esp8089_spi: dummy probe failure");
+      goto _fail;
+    }
 
     sem_timeout = down_timeout(&esp_powerup_sem, msecs_to_jiffies(ESP_WAIT_UP_TIME_MS));
     printk("esp8089_spi: sem_timeout = %lld\n", sem_timeout);
@@ -2337,48 +2346,41 @@ static int __init esp_spi_init(void) {
       break;
     }
 
-                esp_dbg(ESP_SHOW, "esp8089_spi: %s ------ RETRY ------ \n", __func__);
-
+    esp_dbg(ESP_SHOW, "esp8089_spi: %s ------ RETRY ------ \n", __func__);
 		sif_record_retry_config();
-
-                spi_unregister_driver(&esp_spi_dummy_driver);
-
-                sif_platform_target_poweroff();
+    spi_unregister_driver(&esp_spi_dummy_driver);
+    sif_platform_target_poweroff();
                 
-        } while (retry--);
+  } while (--retry);
 
-        if (!powerup) {
-                esp_dbg(ESP_DBG_ERROR, "esp8089_spi: eagle spi can not power up!\n");
+  if (!powerup) {
+    esp_dbg(ESP_DBG_ERROR, "esp8089_spi: eagle spi can not power up!\n");
 
-                err = -ENODEV;
-                goto _fail;
-        }
+    err = -ENODEV;
+    goto _fail;
+  }
 
-        esp_dbg(ESP_SHOW, "esp8089_spi: ESP8089 power up OK\n");
+  esp_dbg(ESP_SHOW, "esp8089_spi: ESP8089 power up OK\n");
 
-        spi_unregister_driver(&esp_spi_dummy_driver);
+  spi_unregister_driver(&esp_spi_dummy_driver);
 
-        sif_sdio_state = ESP_SDIO_STATE_FIRST_INIT;
-        sema_init(&esp_powerup_sem, 0);
+  sif_sdio_state = ESP_SDIO_STATE_FIRST_INIT;
+  sema_init(&esp_powerup_sem, 0);
 
-        spi_register_driver(&esp_spi_driver);
+  spi_register_driver(&esp_spi_driver);
 
-        if (down_timeout(&esp_powerup_sem,
-            msecs_to_jiffies(ESP_WAIT_UP_TIME_MS)) == 0 && 
-            sif_get_ate_config() == 0) {
+  sem_timeout = down_timeout(&esp_powerup_sem, msecs_to_jiffies(ESP_WAIT_UP_TIME_MS));
+  printk("esp8089_spi: sem_timeout = %lld\n", sem_timeout);
+  if (sem_timeout == 0 && sif_get_ate_config() == 0) {
 		if(sif_sdio_state == ESP_SDIO_STATE_FIRST_NORMAL_EXIT){
-                	spi_unregister_driver(&esp_spi_driver);
-
-			msleep(100);
-                
+    	spi_unregister_driver(&esp_spi_driver);
+			msleep(100);     
 			sif_sdio_state = ESP_SDIO_STATE_SECOND_INIT;
-        	
 			spi_register_driver(&esp_spi_driver);
-		}
-                
-        }
+		}             
+  }
 
-        esp_register_early_suspend();
+  esp_register_early_suspend();
 	esp_wake_unlock();
 #ifdef REQUEST_RTC_IRQ
 	request_rtc_irq();
@@ -2387,9 +2389,7 @@ static int __init esp_spi_init(void) {
   printk("esp8089_spi: %s err %d\n", __func__, err);
 
 #ifdef REGISTER_SPI_BOARD_INFO
-  spi = sif_platform_register_board_info();
   if (spi) {
-    printk("esp8089_spi: register board OK\n");
     err = esp_spi_probe(spi);
   } else
     printk("esp8089_spi: No slave to probe\n");

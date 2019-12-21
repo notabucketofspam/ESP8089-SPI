@@ -19,7 +19,7 @@ the moment.
 | BCM 19       | GPIO12        | MISO             |
 | BCM 20       | GPIO14        | MOSI             |
 | BCM 21       | GPIO14        | SCLK             |
-| BCM 26       | GPIO0         | esp\_ack\_int    |
+| BCM 26       | GPIO0 & GPIO2 | esp\_ack\_int    |
 
 ## Software
 
