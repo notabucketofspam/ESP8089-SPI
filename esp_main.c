@@ -73,9 +73,10 @@ char *mod_eagle_path_get(void)
 
 int esp_pub_init_all(struct esp_pub *epub)
 {
-  printk("esp8089_spi: %s\n", __func__);
         int ret = 0;
         
+  printk("esp8089_spi: %s\n", __func__);
+
 	/* completion for bootup event poll*/
 	DECLARE_COMPLETION_ONSTACK(complete);
 	atomic_set(&epub->ps.state, ESP_PM_OFF);
@@ -183,7 +184,6 @@ struct esp_fw_blk_hdr {
 #ifndef FPGA_DEBUG
 static int esp_download_fw(struct esp_pub * epub)
 {
-  printk("esp8089_spi: %s\n", __func__);
 #ifndef HAS_FW
         const struct firmware *fw_entry;
 #endif /* !HAS_FW */
@@ -196,6 +196,8 @@ static int esp_download_fw(struct esp_pub * epub)
         struct sip_cmd_bootup bootcmd;
 
 #ifndef HAS_FW
+
+  printk("esp8089_spi: %s\n", __func__);
 
         if(sif_get_ate_config() == 1) {
 		char * esp_fw_name = ESP_FW_NAME3;

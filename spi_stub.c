@@ -222,8 +222,9 @@ module_exit(esp_spi_exit);
 #include <linux/moduleparam.h>
 
 struct spi_device_id esp_spi_id[] = { 
-  {"esp8089-spi-0", 0 }, 
-  {"esp8089-spi-1", 1 },
+  {"esp8089_spi_0", 0 }, 
+  {"esp8089_spi_1", 1 },
+  {},
 };
 
 static int esp_spi_bus = 0;
@@ -234,6 +235,7 @@ module_param(esp_cs0_pin, int, 0);
 MODULE_PARM_DESC(esp_cs0_pin, "ESP8089 CS_0 GPIO number");
 
 #ifdef REGISTER_SPI_BOARD_INFO
+
 #define MAX_SPEED_HZ SPI_FREQ
 
 static struct spi_master *master;

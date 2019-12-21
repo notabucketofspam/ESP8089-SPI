@@ -369,7 +369,8 @@ u8 beacon_tim_saved[BEACON_TIM_SAVE_MAX];
 int beacon_tim_count;
 static void beacon_tim_init(void)
 {
-	memset(beacon_tim_saved, BEACON_TIM_SAVE_MAX, 0);
+/* memset(beacon_tim_saved, BEACON_TIM_SAVE_MAX, 0); */
+	memset(beacon_tim_saved, 0, BEACON_TIM_SAVE_MAX);
 	beacon_tim_count = 0;
 }
 
@@ -916,15 +917,17 @@ static void esp_op_update_tkip_key(struct ieee80211_hw *hw,
 
 void hw_scan_done(struct esp_pub *epub, bool aborted)
 {
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 9, 0))
+    struct cfg80211_scan_info info = {
+        .scan_start_tsf = 0,
+        .aborted = aborted,
+    };
+  #endif
         cancel_delayed_work_sync(&epub->scan_timeout_work);
 
         ESSERT(epub->wl.scan_req != NULL);
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 9, 0))
-        struct cfg80211_scan_info info = {
-            .scan_start_tsf = 0,
-            .aborted = aborted,
-        };
         ieee80211_scan_completed(epub->hw, &info);
 #elif (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 30))
         ieee80211_scan_completed(epub->hw, aborted);
@@ -938,6 +941,12 @@ void hw_scan_done(struct esp_pub *epub, bool aborted)
 
 static void hw_scan_timeout_report(struct work_struct *work)
 {
+  #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 9, 0))
+    struct cfg80211_scan_info info = {
+      .scan_start_tsf = 0,
+      .aborted = 0,
+    };
+  #endif
         struct esp_pub *epub =
                 container_of(work, struct esp_pub, scan_timeout_work.work);
         bool aborted;
@@ -955,10 +964,7 @@ static void hw_scan_timeout_report(struct work_struct *work)
         }
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 9, 0))
-        struct cfg80211_scan_info info = {
-            .scan_start_tsf = 0,
-            .aborted = aborted,
-        };
+        info.aborted = aborted;
         ieee80211_scan_completed(epub->hw, &info);
 #elif (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 30))
         ieee80211_scan_completed(epub->hw, aborted);

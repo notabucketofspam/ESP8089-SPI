@@ -1489,7 +1489,6 @@ int sif_spi_write_nosync(struct esp_pub *epub, unsigned char *buf, int len, int 
 
 int sif_spi_protocol_init(struct spi_device *spi)
 {
-printk("__func__\n");
 	unsigned char spi_proto_ini_status = 0;
         unsigned char rx_buf1[10];
         unsigned char tx_buf1[10];
@@ -1892,10 +1891,10 @@ void sif_disable_irq(struct esp_pub *epub)
 
 int esp_setup_spi(struct spi_device *spi)
 {
-  printk("esp8089_spi: %s\n", __func__);
 #ifndef ESP_PREALLOC
 	int retry = 10;
 #endif
+  printk("esp8089_spi: %s\n", __func__);
 	/**** alloc buffer for spi io */
 	if (sif_sdio_state == ESP_SDIO_STATE_FIRST_INIT) {
 #ifdef ESP_PREALLOC
@@ -1962,10 +1961,11 @@ static int esp_spi_remove(struct spi_device *spi);
 
 static int esp_spi_probe(struct spi_device *spi) 
 {
-  printk("esp8089_spi: %s\n", __func__);
         int err;
         struct esp_pub *epub;
         struct esp_spi_ctrl *sctrl;
+
+  printk("esp8089_spi: %s\n", __func__);
 
         esp_dbg(ESP_DBG_ERROR, "%s enter\n", __func__);
 
@@ -2271,11 +2271,12 @@ static int __init esp_spi_init(void) {
         int retry = 3;
         bool powerup = false;
         int edf_ret = 0;
-
+#ifdef REGISTER_SPI_BOARD_INFO
+  static struct spi_device* spi;
+#endif
         esp_dbg(ESP_DBG_TRACE, "%s \n", __func__);
 
 #ifdef REGISTER_SPI_BOARD_INFO
-  static struct spi_device* spi;
   spi = sif_platform_register_board_info();
 #endif
 
@@ -2359,8 +2360,9 @@ static int __init esp_spi_init(void) {
 
   printk("esp8089_spi: %s err %d\n", __func__, err);
 
+#ifdef REGISTER_SPI_BOARD_INFO
   err = esp_spi_probe(spi);
-
+#endif
         return err;
 
 _fail:
