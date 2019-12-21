@@ -2357,8 +2357,6 @@ static int __init esp_spi_init(void) {
 	request_rtc_irq();
 #endif
 
-  esp_setup_spi
-
   printk("esp8089_spi: %s err %d\n", __func__, err);
         return err;
 
