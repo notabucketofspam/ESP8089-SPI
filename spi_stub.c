@@ -234,21 +234,29 @@ module_param(esp_cs0_pin, int, 0);
 MODULE_PARM_DESC(esp_cs0_pin, "ESP8089 CS_0 GPIO number");
 
 #ifdef REGISTER_SPI_BOARD_INFO
-static struct spi_board_info esp_board_spi_devices[] = {
-  {
-    .modalias  = "esp8089-spi",
-    .bus_num = 0,   //0 or 1
-    .max_speed_hz  = 18*1000*1000,
-    .chip_select = 0,/*
-    .mode   = SPI_MODE_3,
-    .controller_data = &spi_test_chip[0],*/
-  },
+#define MAX_SPEED_HZ 18*1000*1000
+static struct spi_board_info esp_board_spi_device = {
+  .modalias  = "esp8089-spi",
+  .bus_num = 0,   /* 0 or 1 */
+  .max_speed_hz  = MAX_SPEED_HZ,
+  .chip_select = 0,
+/*.mode   = SPI_MODE_3,*/
+/*.controller_data = &spi_test_chip[0],*/
+};
+
+static struct spi_master esp_spi_master = {
+  .dev = NULL,
+  .bus_num = 0,
+  .num_chipselect = 1,
+  .max_speed_hz = MAX_SPEED_HZ,
 };
 
 void sif_platform_register_board_info(void) {
-  esp_board_spi_devices[0].bus_num = esp_spi_bus;
-  esp_board_spi_devices[0].chip_select = esp_cs0_pin;
-  spi_register_board_info(esp_board_spi_devices, ARRAY_SIZE(esp_board_spi_devices));
+  esp_board_spi_device.bus_num = esp_spi_bus;
+  esp_board_spi_device.chip_select = esp_cs0_pin;
+  esp_spi_master.dev = (esp_spi_bus ? "/dev/spidev1.0" : "/dev/spidev0.0");
+  esp_spi_master.bus_num = esp_spi_bus;
+  spi_new_device(&esp_spi_master, &esp_board_spi_device);
 }
 #endif
 
