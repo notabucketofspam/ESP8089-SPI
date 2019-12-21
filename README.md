@@ -29,11 +29,11 @@ Start with a fresh install of Raspbian.
 
 #### Step one: prerequisites
 
-`sudo apt-get update`
+`sudo apt-get -y update`
 
-`sudo apt-get upgrade`
+`sudo apt-get -y upgrade`
 
-`sudo apt-get install raspberrypi-kernel-headers gcc git make`
+`sudo apt-get -y install raspberrypi-kernel-headers gcc git make`
 
 #### Step two: install
 
