@@ -2303,7 +2303,8 @@ static int __init esp_spi_init(void) {
   long long sem_timeout = 0;
   
 #ifdef REGISTER_SPI_BOARD_INFO
-  static struct spi_device* spi = sif_platform_register_board_info();
+  static struct spi_device* spi;
+  spi = sif_platform_register_board_info();
   if (spi) 
     printk("esp8089_spi: register board OK\n");
 #endif
@@ -2389,19 +2390,18 @@ static int __init esp_spi_init(void) {
   printk("esp8089_spi: %s err %d\n", __func__, err);
 
 #ifdef REGISTER_SPI_BOARD_INFO
-  if (spi) {
+  if (spi)
     err = esp_spi_probe(spi);
-  } else
+  else
     printk("esp8089_spi: No slave to probe\n");
 #endif
-        return err;
+  return err;
 
 _fail:
-        esp_wake_unlock();
-        esp_wakelock_destroy();
-
+  esp_wake_unlock();
+  esp_wakelock_destroy();
   printk("esp8089_spi: %s err %d\n", __func__, err);
-        return err;
+  return err;
 }
 
 static void __exit esp_spi_exit(void) 
