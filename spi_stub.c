@@ -211,7 +211,7 @@ module_exit(esp_spi_exit);
 
 #endif
 
-#define MHz 000000
+#define MHz (1000000)
 
 #include "esp_sif.h"
 #include "linux/interrupt.h"
@@ -233,7 +233,7 @@ MODULE_PARM_DESC(esp_cs0_pin, "ESP8089 CS_0 GPIO number");
 
 #ifdef REGISTER_SPI_BOARD_INFO
 
-#define MAX_SPEED_HZ (10MHz)
+#define MAX_SPEED_HZ (10*MHz)
 
 static struct spi_master *master;
 static struct spi_device *spi;
