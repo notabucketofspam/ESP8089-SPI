@@ -246,7 +246,7 @@ static struct spi_board_info spi_device_info = {
   .max_speed_hz = MAX_SPEED_HZ,
   .bus_num = 1,
   .chip_select = 0,
-  .mode = SPI_READY,
+  .mode = 3,
 };
 
 struct spi_device* sif_platform_register_board_info(void) {
