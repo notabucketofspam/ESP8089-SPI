@@ -235,28 +235,29 @@ MODULE_PARM_DESC(esp_cs0_pin, "ESP8089 CS_0 GPIO number");
 
 #ifdef REGISTER_SPI_BOARD_INFO
 #define MAX_SPEED_HZ 18*1000*1000
-static struct spi_board_info esp_board_spi_device = {
-  .modalias  = "esp8089-spi",
-  .bus_num = 0,   /* 0 or 1 */
-  .max_speed_hz  = MAX_SPEED_HZ,
-  .chip_select = 0,
-/*.mode   = SPI_MODE_3,*/
-/*.controller_data = &spi_test_chip[0],*/
-};
 
 static struct spi_master esp_spi_master = {
-  .dev = NULL,
-  .bus_num = 0,
   .num_chipselect = 1,
   .max_speed_hz = MAX_SPEED_HZ,
 };
 
+static struct spi_device esp_spi_slave = {
+  .modalias  = "esp8089-spi",
+  .chip_select = 0,
+  .max_speed_hz = MAX_SPEED_HZ,
+  .master = &esp_spi_master,
+};
+
+static int esp_spi_master_cs_gpios[1];
+
 void sif_platform_register_board_info(void) {
-  esp_board_spi_device.bus_num = esp_spi_bus;
-  esp_board_spi_device.chip_select = esp_cs0_pin;
-  esp_spi_master.dev = (esp_spi_bus ? "/dev/spidev1.0" : "/dev/spidev0.0");
   esp_spi_master.bus_num = esp_spi_bus;
-  spi_new_device(&esp_spi_master, &esp_board_spi_device);
+  esp_spi_master_cs_gpios[0] = esp_cs0_pin;
+  esp_spi_master.cs_gpios = esp_spi_master_cs_gpios;
+
+  esp_spi_slave.cs_gpio = esp_cs0_pin;
+
+  spi_add_device(&esp_spi_slave);
 }
 #endif
 
