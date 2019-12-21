@@ -52,7 +52,7 @@ Start with a fresh install of Raspbian.
 
 `git clone https://github.com/notabucketofspam/ESP8089-SPI.git`
 
-`cd ~/ESP8089-SPI`
+`cd ESP8089-SPI`
 
 `sudo make install`
 
