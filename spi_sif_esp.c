@@ -2302,6 +2302,9 @@ static int __init esp_spi_init(void) {
 #ifdef REGISTER_SPI_BOARD_INFO
   static struct spi_device* spi;
 #endif
+
+  long long sem_timeout = 0;
+  
         esp_dbg(ESP_DBG_TRACE, "esp8089_spi: %s \n", __func__);
 
 #ifdef DRIVER_VER
@@ -2326,8 +2329,7 @@ static int __init esp_spi_init(void) {
                         goto _fail;
                 }
 
-    long long sem_timeout = down_timeout(&esp_powerup_sem, msecs_to_jiffies(ESP_WAIT_UP_TIME_MS));
-//    long long sem_timeout = 0;
+    sem_timeout = down_timeout(&esp_powerup_sem, msecs_to_jiffies(ESP_WAIT_UP_TIME_MS));
     if (sem_timeout == 0) {
       powerup = true;
 		  msleep(200);

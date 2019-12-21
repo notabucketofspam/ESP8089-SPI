@@ -338,12 +338,12 @@ void sif_platform_reset_target(void) {
   mdelay(200);
   gpio_direction_output(esp_mtdo_gpio, 0);
 */
-  gpio_direction_output(esp_cs0_pin, 1);
+//  gpio_direction_output(esp_cs0_pin, 1);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
-  gpio_direction_output(esp_cs0_pin, 0);
+//  gpio_direction_output(esp_cs0_pin, 0);
 }
 
 void sif_platform_target_poweroff(void) {
@@ -351,13 +351,13 @@ void sif_platform_target_poweroff(void) {
 }
 
 void sif_platform_target_poweron(void) {
-  gpio_direction_output(esp_cs0_pin, 1);
+//  gpio_direction_output(esp_cs0_pin, 1);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
-  gpio_direction_output(esp_cs0_pin, 0);
+//  gpio_direction_output(esp_cs0_pin, 0);
 }
 
 #ifdef ESP_ACK_INTERRUPT
