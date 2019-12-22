@@ -315,7 +315,7 @@ void sif_platform_target_speed(int high_speed) {
 
 }
 
-#define SDIO_BOOT 1
+#define SDIO_BOOT 0
 
 static int esp_reset_gpio = 0;
 module_param(esp_reset_gpio, int, 0);
