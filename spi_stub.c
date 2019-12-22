@@ -318,37 +318,21 @@ void sif_platform_target_speed(int high_speed) {
 
 }
 
+#define SDIO_BOOT 0
+
 static int esp_reset_gpio = 0;
 module_param(esp_reset_gpio, int, 0);
 MODULE_PARM_DESC(esp_reset_gpio, "ESP8089 RST GPIO number");
-/*
-static int esp_mtdo_gpio = 0;
-module_param(esp_mtdo_gpio, int, 0);
-MODULE_PARM_DESC(esp_mtdo_gpio, "ESP8089 MTDO mode GPIO number");
-*/
 
 void sif_platform_reset_target(void) {
-/*  printk("esp8089_spi: ESP8089 reset via GPIO %d\n", esp_reset_gpio);
-  mdelay(200);
-  gpio_request(esp_reset_gpio,"esp_reset");
+  gpio_direction_output(esp_cs0_pin, SDIO_BOOT);
+  gpio_direction_output(esp_ack_int, SPI_FREQ == 30*MHz);
   gpio_direction_output(esp_reset_gpio, 0);
-  mdelay(200);
-  gpio_request(esp_mtdo_gpio,"esp_mtdo");
-  gpio_direction_output(esp_mtdo_gpio, 1);
-  gpio_direction_input(esp_reset_gpio);
-  gpio_free(esp_reset_gpio);
-  mdelay(200);
-  gpio_direction_output(esp_mtdo_gpio, 0);
-*/
-  gpio_direction_output(esp_cs0_pin, 1);
-  gpio_direction_output(esp_ack_int, 1);
-  gpio_direction_output(esp_reset_gpio, SPI_FREQ == 30*MHz);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
   gpio_direction_output(esp_cs0_pin, 0);
   gpio_direction_input(esp_ack_int);
-  gpio_free(esp_ack_int);
   gpio_free(esp_ack_int);
   gpio_free(esp_reset_gpio);
   gpio_free(esp_cs0_pin);
@@ -359,7 +343,7 @@ void sif_platform_target_poweroff(void) {
 }
 
 void sif_platform_target_poweron(void) {
-  gpio_direction_output(esp_cs0_pin, 1);
+  gpio_direction_output(esp_cs0_pin, SDIO_BOOT);
   gpio_direction_output(esp_ack_int, SPI_FREQ == 30*MHz);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 0);
