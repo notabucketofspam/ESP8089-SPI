@@ -2099,7 +2099,7 @@ static int esp_spi_probe(struct spi_device *spi)
 		sif_sdio_state = ESP_SDIO_STATE_FIRST_NORMAL_EXIT;
 		up(&esp_powerup_sem);
 	}
-
+  printk("esp8089_spi: %s EXIT\n", __func__);
         return err;
 _err_ext_gpio:
 #ifdef USE_EXT_GPIO	
@@ -2137,8 +2137,10 @@ _err_first_init:
 		esp_dbg(ESP_DBG_ERROR, "esp8089_spi: first error exit\n");
 		sif_sdio_state = ESP_SDIO_STATE_FIRST_ERROR_EXIT;
 		up(&esp_powerup_sem);
-	}
-        return err;
+	}  
+  printk("esp8089_spi: %s EXIT\n", __func__);
+  return err;
+
 _err_second_init:
 	sif_sdio_state = ESP_SDIO_STATE_SECOND_ERROR_EXIT;
 	esp_spi_remove(spi);

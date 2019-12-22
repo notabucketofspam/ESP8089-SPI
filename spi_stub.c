@@ -320,7 +320,7 @@ void sif_platform_target_speed(int high_speed) {
 
 static int esp_reset_gpio = 0;
 module_param(esp_reset_gpio, int, 0);
-MODULE_PARM_DESC(esp_reset_gpio, "CH_PD / EN reset GPIO number");
+MODULE_PARM_DESC(esp_reset_gpio, "ESP8089 RST GPIO number");
 /*
 static int esp_mtdo_gpio = 0;
 module_param(esp_mtdo_gpio, int, 0);
@@ -341,13 +341,14 @@ void sif_platform_reset_target(void) {
   gpio_direction_output(esp_mtdo_gpio, 0);
 */
   gpio_direction_output(esp_cs0_pin, 1);
-  gpio_direction_output(esp_ack_int, 0);
+  gpio_direction_output(esp_ack_int, 1);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
   gpio_direction_output(esp_cs0_pin, 0);
   gpio_direction_input(esp_ack_int);
+  gpio_free(esp_ack_int);
 }
 
 void sif_platform_target_poweroff(void) {
@@ -356,7 +357,7 @@ void sif_platform_target_poweroff(void) {
 
 void sif_platform_target_poweron(void) {
   gpio_direction_output(esp_cs0_pin, 1);
-  gpio_direction_output(esp_ack_int, 0);
+  gpio_direction_output(esp_ack_int, 1);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
@@ -364,6 +365,7 @@ void sif_platform_target_poweron(void) {
   mdelay(200);
   gpio_direction_output(esp_cs0_pin, 0);
   gpio_direction_input(esp_ack_int);
+  gpio_free(esp_ack_int);
 }
 
 #ifdef ESP_ACK_INTERRUPT
