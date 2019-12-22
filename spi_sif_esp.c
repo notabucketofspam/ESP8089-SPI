@@ -1521,7 +1521,7 @@ int sif_spi_protocol_init(struct spi_device *spi)
                                 mdelay(100);
 				if(++fail_count > 10)
 					return -ETIMEDOUT;
-                        }while( rx_buf1[2] != /*0x01*/ 0x00);
+                        }while( rx_buf1[2] != 0x01 );
                         //  }while(1);
                  }
                 else if( spi_proto_ini_status == 1 )
