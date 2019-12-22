@@ -14,10 +14,10 @@ the moment.
 
 | Raspberry Pi | ESP8089       | Function         |
 | ------------ | ------------- | ---------------- |
-| BCM 13       | RST           | esp\_reset\_gpio |
+| BCM 13       | CH\_PD / EN   | esp\_reset\_gpio |
 | BCM 16       | GPIO15        | esp\_cs0\_pin    |
 | BCM 19       | GPIO12        | MISO             |
-| BCM 20       | GPIO14        | MOSI             |
+| BCM 20       | GPIO13        | MOSI             |
 | BCM 21       | GPIO14        | SCLK             |
 | BCM 26       | GPIO0 & GPIO2 | esp\_ack\_int    |
 
@@ -76,7 +76,7 @@ pins used for this operation, though, are exposed on most varieties of the
 chip. These pins can be therefore utilized to load any custom firmware onto an 
 ESP8266; in fact, this is what the eagle\_fw\#.h files are.
 
-Upon boot of the host device, the ESP chip is power cycled using the RST 
+Upon boot of the host device, the ESP chip is power cycled using the CH\_PD 
 pin \(held low\) and subsequently set to load code over SPI via the MTDO pin 
 \(held high\). Optionally, GPIO0 and GPIO2 can be connected to BCM 26 to ensure 
 the correct boot configuration, but these pins are held high by default by the 
