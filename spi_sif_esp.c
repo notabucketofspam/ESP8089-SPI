@@ -1514,7 +1514,6 @@ int sif_spi_protocol_init(struct spi_device *spi)
   printk("esp8089_spi: %s, %d\n", __FILE__, __LINE__);
   printk("esp8089_spi: fail_count = %d\n", fail_count);
                                 sif_spi_write_raw(spi, tx_buf1, 6);
-                                mdelay(100);
                                 sif_spi_write_async_read(spi,dummy_tx_buf, rx_buf1,10);
                                 mdelay(100);
   esp_dbg(ESP_DBG_ERROR, "rx:[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x]\n", 
@@ -1957,7 +1956,7 @@ int esp_setup_spi(struct spi_device *spi)
 /* https://www.kernel.org/doc/Documentation/spi/spi-summary */
 /* https://linux-sunxi.org/SPIdev */
 
-//  ret = spi_setup(spi);
+  ret = spi_setup(spi);
   if( ret ){
         printk("esp8089_spi: FAILED to setup slave.\n");
         spi_unregister_device( spi );
