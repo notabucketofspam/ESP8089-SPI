@@ -182,8 +182,8 @@ module_exit(esp_spi_exit);
 
 #define MHz (1000000)
 
-//#define SPI_FREQ (20*MHz)                             //  1. 22.5Mhz     2. 45Mhz
-#define SPI_FREQ (30*MHz)                             //  1. 22.5Mhz     2. 45Mhz
+#define SPI_FREQ (20*MHz)                             //  1. 22.5Mhz     2. 45Mhz
+//#define SPI_FREQ (30*MHz)                             //  1. 22.5Mhz     2. 45Mhz
 
 //Below are for spi HZ 22.5M
 #if (SPI_FREQ == 30*MHz)
@@ -342,7 +342,7 @@ void sif_platform_reset_target(void) {
 */
   gpio_direction_output(esp_cs0_pin, 1);
   gpio_direction_output(esp_ack_int, 1);
-  gpio_direction_output(esp_reset_gpio, 0);
+  gpio_direction_output(esp_reset_gpio, SPI_FREQ == 30*MHz);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
@@ -357,7 +357,7 @@ void sif_platform_target_poweroff(void) {
 
 void sif_platform_target_poweron(void) {
   gpio_direction_output(esp_cs0_pin, 1);
-  gpio_direction_output(esp_ack_int, 1);
+  gpio_direction_output(esp_ack_int, SPI_FREQ == 30*MHz);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
