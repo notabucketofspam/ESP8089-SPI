@@ -2309,11 +2309,11 @@ static int __init esp_spi_init(void) {
     printk("esp8089_spi: register board OK\n");
 #endif
 
-        esp_dbg(ESP_DBG_TRACE, "esp8089_spi: %s \n", __func__);
+  esp_dbg(ESP_DBG_TRACE, "esp8089_spi: %s \n", __func__);
 
 #ifdef DRIVER_VER
-        ver = DRIVER_VER;
-        esp_dbg(ESP_SHOW, "esp8089_spi: EAGLE DRIVER VER %llx\n", ver);
+  ver = DRIVER_VER;
+  esp_dbg(ESP_SHOW, "esp8089_spi: EAGLE DRIVER VER %llx\n", ver);
 #endif
 
   edf_ret = esp_debugfs_init();
@@ -2333,11 +2333,16 @@ static int __init esp_spi_init(void) {
       goto _fail;
     }
 
-    err = esp_spi_dummy_probe(spi);
-    if (err) {
-      printk("esp8089_spi: dummy probe failure");
-      goto _fail;
-    }
+    #ifdef REGISTER_SPI_BOARD_INFO
+      if (spi)
+        err = esp_spi_dummy_probe(spi);
+      else
+        printk("esp8089_spi: No slave to probe\n");
+      if (err) {
+        printk("esp8089_spi: dummy probe failure");
+        goto _fail;
+      }
+    #endif
 
     sem_timeout = down_timeout(&esp_powerup_sem, msecs_to_jiffies(ESP_WAIT_UP_TIME_MS));
     printk("esp8089_spi: sem_timeout = %lld\n", sem_timeout);
@@ -2370,6 +2375,17 @@ static int __init esp_spi_init(void) {
 
   spi_register_driver(&esp_spi_driver);
 
+  #ifdef REGISTER_SPI_BOARD_INFO
+    if (spi)
+      err = esp_spi_probe(spi);
+    else
+      printk("esp8089_spi: No slave to probe\n");
+    if (err) {
+      printk("esp8089_spi: probe failure");
+      goto _fail;
+    }
+  #endif
+
   sem_timeout = down_timeout(&esp_powerup_sem, msecs_to_jiffies(ESP_WAIT_UP_TIME_MS));
   printk("esp8089_spi: sem_timeout = %lld\n", sem_timeout);
   if (sem_timeout == 0 && sif_get_ate_config() == 0) {
@@ -2389,12 +2405,6 @@ static int __init esp_spi_init(void) {
 
   printk("esp8089_spi: %s err %d\n", __func__, err);
 
-#ifdef REGISTER_SPI_BOARD_INFO
-  if (spi)
-    err = esp_spi_probe(spi);
-  else
-    printk("esp8089_spi: No slave to probe\n");
-#endif
   return err;
 
 _fail:
