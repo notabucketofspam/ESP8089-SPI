@@ -1908,7 +1908,7 @@ void sif_disable_irq(struct esp_pub *epub)
 
 int esp_setup_spi(struct spi_device *spi)
 {
-int ret;
+  int ret = 0;
 #ifndef ESP_PREALLOC
 	int retry = 10;
 #endif
@@ -1993,7 +1993,7 @@ static int esp_spi_probe(struct spi_device *spi)
         struct esp_pub *epub;
         struct esp_spi_ctrl *sctrl;
 
-  printk("esp8089_spi: %s\n", __func__);
+  printk("esp8089_spi: %s ENTER\n", __func__);
 
         //esp_dbg(ESP_DBG_ERROR, "esp8089_spi: %s enter\n", __func__);
 
