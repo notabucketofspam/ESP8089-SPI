@@ -182,11 +182,11 @@ module_exit(esp_spi_exit);
 
 #define MHz (1000000)
 
-#define SPI_FREQ (20*MHz)                             //  1. 22.5Mhz     2. 45Mhz
-//#define SPI_FREQ (30*MHz)                             //  1. 22.5Mhz     2. 45Mhz
+#define SPI_FREQ (20000000)                             //  1. 22.5Mhz     2. 45Mhz
+//#define SPI_FREQ (30000000)                             //  1. 22.5Mhz     2. 45Mhz
 
 //Below are for spi HZ 22.5M
-#if (SPI_FREQ == 30*MHz)
+#if (SPI_FREQ == 30000000)
 
 #define CMD_RESP_SIZE   (10) //(50)    //Common respon wait time
 #define DATA_RESP_SIZE_W   (142+45) // (1024*13)//   (1024*16)  //(398+400) // (1024*10)    //Only for Write bytes function, data write response.  max:(361+109) 
@@ -198,7 +198,7 @@ module_exit(esp_spi_exit);
 #define BLOCK_R_DATA_RESP_SIZE_1ST   (265)  // (231+75)    //For each data read resp size, in block read  ,max: 134
 #define BLOCK_R_DATA_RESP_SIZE_EACH    (10)  // (20)   //For each data read resp size, in block read 
 
-#elif(SPI_FREQ == 20*MHz)
+#elif(SPI_FREQ == 20000000)
 
 #define CMD_RESP_SIZE (10)    //Common respon wait time
 #define DATA_RESP_SIZE_W (103+40)    //Only for Write bytes function, data write response.  max: 103
@@ -269,8 +269,6 @@ static int esp_ack_int = 0;
 module_param(esp_ack_int, int, 0);
 MODULE_PARM_DESC(esp_ack_int, "Acknowledge interrupt GPIO number");
 
-#define GPIO_NO esp_ack_int
-
 int sif_platform_irq_init(void) { 
   int ret;
 
@@ -321,14 +319,14 @@ void sif_platform_target_speed(int high_speed) {
 
 static int esp_reset_gpio = 0;
 module_param(esp_reset_gpio, int, 0);
-MODULE_PARM_DESC(esp_reset_gpio, "ESP8089 RST GPIO number");
+MODULE_PARM_DESC(esp_reset_gpio, "ESP8089 CH_PD GPIO number");
 
 void sif_platform_reset_target(void) {
   gpio_request(esp_cs0_pin, "esp_cs0_pin");
   gpio_request(esp_ack_int, "esp_ack_int");
   gpio_request(esp_reset_gpio, "esp_reset_gpio");
   gpio_direction_output(esp_cs0_pin, SDIO_BOOT);
-  gpio_direction_output(esp_ack_int, SPI_FREQ == 30*MHz);
+  gpio_direction_output(esp_ack_int, SPI_FREQ == 30000000);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 1);
@@ -349,7 +347,7 @@ void sif_platform_target_poweron(void) {
   gpio_request(esp_ack_int, "esp_ack_int");
   gpio_request(esp_reset_gpio, "esp_reset_gpio");
   gpio_direction_output(esp_cs0_pin, SDIO_BOOT);
-  gpio_direction_output(esp_ack_int, SPI_FREQ == 30*MHz);
+  gpio_direction_output(esp_ack_int, SPI_FREQ == 30000000);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
