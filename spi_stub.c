@@ -280,7 +280,6 @@ int sif_platform_irq_init(void) {
 		printk(KERN_ERR "esp8089_spi: request gpio error\n");
 		return ret;
 	}
-
 	gpio_direction_input(esp_ack_int);
 
         sif_platform_irq_clear();
@@ -318,13 +317,16 @@ void sif_platform_target_speed(int high_speed) {
 
 }
 
-#define SDIO_BOOT 0
+#define SDIO_BOOT 1
 
 static int esp_reset_gpio = 0;
 module_param(esp_reset_gpio, int, 0);
 MODULE_PARM_DESC(esp_reset_gpio, "ESP8089 RST GPIO number");
 
 void sif_platform_reset_target(void) {
+  gpio_request(esp_cs0_pin, "esp_cs0_pin");
+  gpio_request(esp_ack_int, "esp_ack_int");
+  gpio_request(esp_reset_gpio, "esp_reset_gpio");
   gpio_direction_output(esp_cs0_pin, SDIO_BOOT);
   gpio_direction_output(esp_ack_int, SPI_FREQ == 30*MHz);
   gpio_direction_output(esp_reset_gpio, 0);
@@ -343,6 +345,9 @@ void sif_platform_target_poweroff(void) {
 }
 
 void sif_platform_target_poweron(void) {
+  gpio_request(esp_cs0_pin, "esp_cs0_pin");
+  gpio_request(esp_ack_int, "esp_ack_int");
+  gpio_request(esp_reset_gpio, "esp_reset_gpio");
   gpio_direction_output(esp_cs0_pin, SDIO_BOOT);
   gpio_direction_output(esp_ack_int, SPI_FREQ == 30*MHz);
   mdelay(200);
