@@ -326,13 +326,13 @@ void sif_platform_reset_target(void) {
   gpio_request(esp_ack_int, "esp_ack_int");
   gpio_request(esp_reset_gpio, "esp_reset_gpio");
 //  gpio_direction_output(esp_cs0_pin, SDIO_BOOT);
-  gpio_direction_output(esp_ack_int, SPI_FREQ == 30000000);
+  gpio_direction_output(esp_ack_int, /*SPI_FREQ == 30000000*/1);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
 //  gpio_direction_output(esp_cs0_pin, 0);
-  gpio_direction_input(esp_ack_int);
+//  gpio_direction_input(esp_ack_int);
   gpio_free(esp_ack_int);
   gpio_free(esp_reset_gpio);
 //  gpio_free(esp_cs0_pin);
@@ -347,14 +347,14 @@ void sif_platform_target_poweron(void) {
   gpio_request(esp_ack_int, "esp_ack_int");
   gpio_request(esp_reset_gpio, "esp_reset_gpio");
 //  gpio_direction_output(esp_cs0_pin, SDIO_BOOT);
-  gpio_direction_output(esp_ack_int, SPI_FREQ == 30000000);
+  gpio_direction_output(esp_ack_int, /*SPI_FREQ == 30000000*/1);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
 //  gpio_direction_output(esp_cs0_pin, 0);
-  gpio_direction_input(esp_ack_int);
+//  gpio_direction_input(esp_ack_int);
   gpio_free(esp_ack_int);
   gpio_free(esp_reset_gpio);
 //  gpio_free(esp_cs0_pin);
@@ -366,7 +366,7 @@ void sif_platform_ack_interrupt(struct esp_pub *epub) {
 }
 #endif
 
-//module_init(esp_spi_init);
-late_initcall(esp_spi_init);
+module_init(esp_spi_init);
+//late_initcall(esp_spi_init);
 module_exit(esp_spi_exit);
 
