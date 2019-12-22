@@ -1514,11 +1514,13 @@ int sif_spi_protocol_init(struct spi_device *spi)
   printk("esp8089_spi: %s, %d\n", __FILE__, __LINE__);
   printk("esp8089_spi: fail_count = %d\n", fail_count);
                                 sif_spi_write_raw(spi, tx_buf1, 6);
+                                mdelay(100);
                                 sif_spi_write_async_read(spi,dummy_tx_buf, rx_buf1,10);
+                                mdelay(100);
   esp_dbg(ESP_DBG_ERROR, "rx:[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x]\n", 
     rx_buf1[0],rx_buf1[1],rx_buf1[2],rx_buf1[3],rx_buf1[4],rx_buf1[5],rx_buf1[6],rx_buf1[7],rx_buf1[8],rx_buf1[9]);
                                 mdelay(100);
-				if(fail_count++ > 10)
+				if(++fail_count > 10)
 					return -ETIMEDOUT;
                         }while( rx_buf1[2] != 0x01 );
                         //  }while(1);
@@ -2082,7 +2084,7 @@ static int esp_spi_probe(struct spi_device *spi)
         err = esp_pub_init_all(epub);
 
         if (err) {
-                esp_dbg(ESP_DBG_ERROR, "esp_init_all failed: %d\n", err);
+                esp_dbg(ESP_DBG_ERROR, "esp8089_spi: esp_init_all failed: %d\n", err);
                 if(sif_sdio_state == ESP_SDIO_STATE_FIRST_INIT){
 			err = 0;
 			goto _err_first_init;
@@ -2091,7 +2093,7 @@ static int esp_spi_probe(struct spi_device *spi)
 			goto _err_second_init;
         }
 
-        esp_dbg(ESP_DBG_TRACE, "esp8089_spi:  %s return  %d\n", __func__, err);
+        esp_dbg(ESP_DBG_TRACE, "esp8089_spi: %s return  %d\n", __func__, err);
 	if(sif_sdio_state == ESP_SDIO_STATE_FIRST_INIT){
 		esp_dbg(ESP_DBG_ERROR, "esp8089_spi: first normal exit\n");
 		sif_sdio_state = ESP_SDIO_STATE_FIRST_NORMAL_EXIT;
