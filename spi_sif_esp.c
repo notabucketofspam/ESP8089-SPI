@@ -166,7 +166,7 @@ int sif_spi_write_async_read(struct spi_device *spi, unsigned char* bufwrite,uns
 		.tx_buf		= bufwrite,
 		.len		= size,
 		.bits_per_word	= 8,
-		.speed_hz	= SPI_FREQ,
+		.speed_hz	= SPI_FREQ == 20000000 ? 25000000 : 50000000,
 	};
 	struct spi_message msg;
 	int error;
@@ -191,7 +191,7 @@ int sif_spi_write_raw(struct spi_device *spi, unsigned char* buf, int size)
 		.tx_buf		= buf,
 		.len		= size,
 		.bits_per_word	= 8,
-		.speed_hz	= SPI_FREQ,
+		.speed_hz	= SPI_FREQ == 20000000 ? 25000000 : 50000000,
 	};
 	struct spi_message msg;
 

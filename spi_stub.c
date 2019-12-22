@@ -224,7 +224,7 @@ module_exit(esp_spi_exit);
 #include <linux/moduleparam.h>
 
 struct spi_device_id esp_spi_id[] = { 
-  {"esp_spi_0", 0 },
+  {"esp_spi_0", 0},
   {"esp_spi_1", 1},
   {},
 };
@@ -315,7 +315,7 @@ void sif_platform_target_speed(int high_speed) {
 
 }
 
-#define SDIO_BOOT 0
+#define SDIO_BOOT 1
 
 static int esp_reset_gpio = 0;
 module_param(esp_reset_gpio, int, 0);
