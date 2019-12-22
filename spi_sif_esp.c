@@ -1989,7 +1989,6 @@ static int esp_spi_remove(struct spi_device *spi);
 
 static int esp_spi_probe(struct spi_device *spi) 
 {
-gpio_direction_input(19);
         int err;
         struct esp_pub *epub;
         struct esp_spi_ctrl *sctrl;
