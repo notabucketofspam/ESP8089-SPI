@@ -182,8 +182,8 @@ module_exit(esp_spi_exit);
 
 #define MHz (1000000)
 
-#define SPI_FREQ (20*MHz)                             //  1. 22.5Mhz     2. 45Mhz
-//#define SPI_FREQ (30*MHz)                             //  1. 22.5Mhz     2. 45Mhz
+//#define SPI_FREQ (20*MHz)                             //  1. 22.5Mhz     2. 45Mhz
+#define SPI_FREQ (30*MHz)                             //  1. 22.5Mhz     2. 45Mhz
 
 //Below are for spi HZ 22.5M
 #if (SPI_FREQ == 30*MHz)
