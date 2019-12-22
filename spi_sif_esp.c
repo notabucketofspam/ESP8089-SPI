@@ -1495,7 +1495,7 @@ int sif_spi_protocol_init(struct spi_device *spi)
         unsigned char dummy_tx_buf[10];
         memset(dummy_tx_buf,0xff,sizeof(dummy_tx_buf));      
 
-  printk("esp8089_spi: %s, %d\n", __FILE__, __LINE__);
+  printk("esp8089_spi: %s\n", __func__);
 
         do
         {            
@@ -1955,7 +1955,7 @@ int ret;
 /* https://www.kernel.org/doc/Documentation/spi/spi-summary */
 /* https://linux-sunxi.org/SPIdev */
 
-  ret = spi_setup(spi);
+//  ret = spi_setup(spi);
   if( ret ){
         printk("esp8089_spi: FAILED to setup slave.\n");
         spi_unregister_device( spi );
@@ -2000,7 +2000,7 @@ static int esp_spi_probe(struct spi_device *spi)
 	err = esp_setup_spi(spi);
 
 	if (err) {
-		esp_dbg(ESP_DBG_ERROR, "%s setup_spi error[%d]\n", __func__, err);
+		esp_dbg(ESP_DBG_ERROR, "esp8089_spi: %s setup_spi error[%d]\n", __func__, err);
                 if(sif_sdio_state == ESP_SDIO_STATE_FIRST_INIT)
 			goto _err_spi;
 		else
