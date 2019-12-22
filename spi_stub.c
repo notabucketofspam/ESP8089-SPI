@@ -182,8 +182,8 @@ module_exit(esp_spi_exit);
 
 #define MHz (1000000)
 
-#define SPI_FREQ (20000000)                             //  1. 22.5Mhz     2. 45Mhz
-//#define SPI_FREQ (30000000)                             //  1. 22.5Mhz     2. 45Mhz
+//#define SPI_FREQ (20000000)                             //  1. 22.5Mhz     2. 45Mhz
+#define SPI_FREQ (30000000)                             //  1. 22.5Mhz     2. 45Mhz
 
 //Below are for spi HZ 22.5M
 #if (SPI_FREQ == 30000000)
@@ -322,20 +322,20 @@ module_param(esp_reset_gpio, int, 0);
 MODULE_PARM_DESC(esp_reset_gpio, "ESP8089 CH_PD GPIO number");
 
 void sif_platform_reset_target(void) {
-  gpio_request(esp_cs0_pin, "esp_cs0_pin");
+//  gpio_request(esp_cs0_pin, "esp_cs0_pin");
   gpio_request(esp_ack_int, "esp_ack_int");
   gpio_request(esp_reset_gpio, "esp_reset_gpio");
-  gpio_direction_output(esp_cs0_pin, SDIO_BOOT);
+//  gpio_direction_output(esp_cs0_pin, SDIO_BOOT);
   gpio_direction_output(esp_ack_int, SPI_FREQ == 30000000);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
-  gpio_direction_output(esp_cs0_pin, 0);
+//  gpio_direction_output(esp_cs0_pin, 0);
   gpio_direction_input(esp_ack_int);
   gpio_free(esp_ack_int);
   gpio_free(esp_reset_gpio);
-  gpio_free(esp_cs0_pin);
+//  gpio_free(esp_cs0_pin);
 }
 
 void sif_platform_target_poweroff(void) {
@@ -343,21 +343,21 @@ void sif_platform_target_poweroff(void) {
 }
 
 void sif_platform_target_poweron(void) {
-  gpio_request(esp_cs0_pin, "esp_cs0_pin");
+//  gpio_request(esp_cs0_pin, "esp_cs0_pin");
   gpio_request(esp_ack_int, "esp_ack_int");
   gpio_request(esp_reset_gpio, "esp_reset_gpio");
-  gpio_direction_output(esp_cs0_pin, SDIO_BOOT);
+//  gpio_direction_output(esp_cs0_pin, SDIO_BOOT);
   gpio_direction_output(esp_ack_int, SPI_FREQ == 30000000);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
-  gpio_direction_output(esp_cs0_pin, 0);
+//  gpio_direction_output(esp_cs0_pin, 0);
   gpio_direction_input(esp_ack_int);
   gpio_free(esp_ack_int);
   gpio_free(esp_reset_gpio);
-  gpio_free(esp_cs0_pin);
+//  gpio_free(esp_cs0_pin);
 }
 
 #ifdef ESP_ACK_INTERRUPT
