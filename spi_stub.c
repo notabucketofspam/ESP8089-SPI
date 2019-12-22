@@ -349,6 +349,9 @@ void sif_platform_reset_target(void) {
   gpio_direction_output(esp_cs0_pin, 0);
   gpio_direction_input(esp_ack_int);
   gpio_free(esp_ack_int);
+  gpio_free(esp_ack_int);
+  gpio_free(esp_reset_gpio);
+  gpio_free(esp_cs0_pin);
 }
 
 void sif_platform_target_poweroff(void) {
@@ -366,6 +369,8 @@ void sif_platform_target_poweron(void) {
   gpio_direction_output(esp_cs0_pin, 0);
   gpio_direction_input(esp_ack_int);
   gpio_free(esp_ack_int);
+  gpio_free(esp_reset_gpio);
+  gpio_free(esp_cs0_pin);
 }
 
 #ifdef ESP_ACK_INTERRUPT
