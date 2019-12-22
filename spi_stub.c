@@ -224,7 +224,7 @@ module_exit(esp_spi_exit);
 #include <linux/moduleparam.h>
 
 struct spi_device_id esp_spi_id[] = { 
-  {"esp8089_spi_0", 0 },
+  {"esp_spi_0", 0 },
   {"esp_spi_1", 1},
   {},
 };
