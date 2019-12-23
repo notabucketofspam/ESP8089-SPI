@@ -19,7 +19,7 @@ the moment.
 | BCM 19       | GPIO12        | MISO             |
 | BCM 20       | GPIO13        | MOSI             |
 | BCM 21       | GPIO14        | SCLK             |
-| BCM 26       | GPIO0 & GPIO2 | esp\_ack\_int    |
+| BCM 26       | GPIO0         | esp\_ack\_int    |
 
 ## Software
 
@@ -47,21 +47,23 @@ Start with a fresh install of Raspbian.
 
 #### Step three: configure
 
-`sudo echo "options esp8089-spi esp_reset_gpio=13 esp_cs0_pin=16 esp_ack_int=26" > /etc/modprobe.d/esp.conf`
+`sudo su`
 
-`sudo echo "esp8089_spi" >> /etc/modprobe.d/blacklist`
+`echo "options esp8089-spi esp_reset_gpio=13 esp_cs0_pin=16 esp_ack_int=26" > /etc/modprobe.d/esp.conf`
 
-`sudo echo "spi_bcm2835" >> /etc/modules`
+`echo "esp8089_spi" >> /etc/modprobe.d/blacklist`
 
-`sudo echo "spi_bcm2835aux" >> /etc/modules`
+`echo "spi_bcm2835" >> /etc/modules`
 
-`sudo echo "esp8089_spi" >> /etc/modules`
+`echo "spi_bcm2835aux" >> /etc/modules`
 
-`sudo echo "dtparam=spi=on" >> /boot/config.txt`
+`echo "esp8089_spi" >> /etc/modules`
 
-`sudo echo "dtoverlay=spi1-1cs,cs0_pin=16,cs0_spidev=disabled" >> /boot/config.txt`
+`echo "dtparam=spi=on" >> /boot/config.txt`
 
-`sudo reboot`
+`echo "dtoverlay=spi1-1cs,cs0_pin=16,cs0_spidev=disabled" >> /boot/config.txt`
+
+`reboot`
 
 ## How it works
 
