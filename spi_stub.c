@@ -318,7 +318,7 @@ MODULE_PARM_DESC(esp_reset_gpio, "ESP8089 CH_PD GPIO number");
 void sif_platform_reset_target(void) {
   gpio_request(esp_cs0_pin, "esp_cs0_pin");
   gpio_request(esp_reset_gpio, "esp_reset_gpio");
-  gpio_direction_output(esp_cs0_pin, SDIO_BOOT);
+  gpio_direction_output(esp_cs0_pin, 1);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 1);
@@ -335,7 +335,7 @@ void sif_platform_target_poweroff(void) {
 void sif_platform_target_poweron(void) {
   gpio_request(esp_cs0_pin, "esp_cs0_pin");
   gpio_request(esp_reset_gpio, "esp_reset_gpio");
-  gpio_direction_output(esp_cs0_pin, SDIO_BOOT);
+  gpio_direction_output(esp_cs0_pin, 1);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
