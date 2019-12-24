@@ -12,26 +12,30 @@ the moment.
 
 #### What pins go where:
 
-| Raspberry Pi | ESP8089       | Function         |
-| ------------ | ------------- | ---------------- |
-| BCM 13       | CH\_PD / EN   | esp\_reset\_gpio |
-| BCM 16       | GPIO15        | esp\_cs0\_pin    |
-| BCM 19       | GPIO12        | MISO             |
-| BCM 20       | GPIO13        | MOSI             |
-| BCM 21       | GPIO14        | SCLK             |
-| BCM 26       | GPIO0         | esp\_ack\_int    |
+| Raspberry Pi | ESP8089        | Function         |
+| ------------ | -------------- | ---------------- |
+| BCM 13       | CH\_PD / EN    | esp\_reset\_gpio |
+| BCM 16       | GPIO11         | esp\_cs0\_pin    |
+| BCM 19       | GPIO7          | MISO             |
+| BCM 20       | GPIO8          | MOSI             |
+| BCM 21       | GPIO6          | SCLK             |
+| BCM 26       | GPIO0 & GPIO15 | esp\_mtdo\_int   |
 
 ## Software
 
 Start with a fresh install of Raspbian.
 
-#### Step one: prerequisites
+#### Step zero: prerequisites
 
 `sudo apt-get -y update`
 
 `sudo apt-get -y upgrade`
 
 `sudo apt-get -y install raspberrypi-kernel-headers gcc git make`
+
+#### Step one: kernel
+
+TBA
 
 #### Step two: install
 
