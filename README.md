@@ -49,7 +49,7 @@ Start with a fresh install of Raspbian.
 
 `sudo su`
 
-`echo "options esp8089-spi esp_reset_gpio=13 esp_cs0_pin=16 esp_ack_int=26" > /etc/modprobe.d/esp.conf`
+`echo "options esp8089-spi esp_reset_gpio=13 esp_cs0_pin=16" > /etc/modprobe.d/esp.conf`
 
 `echo "esp8089_spi" >> /etc/modprobe.d/blacklist`
 
