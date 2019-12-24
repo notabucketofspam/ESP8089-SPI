@@ -31,11 +31,39 @@ Start with a fresh install of Raspbian.
 
 `sudo apt-get -y upgrade`
 
+`sudo apt dist-upgrade`
+
 `sudo apt-get -y install raspberrypi-kernel-headers gcc git make`
+
+`sudo apt install bc bison flex libssl-dev device-tree-compiler`
 
 #### Step one: kernel
 
-TBA
+`mkdir ~/pi`
+
+`cd ~/pi`
+
+`git clone --depth=1 https://github.com/raspberrypi/linux`
+
+`cd linux`
+
+`sed -i 's/spi->master->dev\.parent->dma_mask/0/g' drivers/mmc/host/mmc_spi.c`
+
+`KERNEL=kernel`
+
+`make bcmrpi_defconfig`
+
+`make -j2 zImage modules dtbs`
+
+`sudo make modules_install`
+
+`sudo cp arch/arm/boot/dts/*.dtb /boot/`
+
+`sudo cp arch/arm/boot/dts/overlays/*.dtb* /boot/overlays/`
+
+`sudo cp arch/arm/boot/dts/overlays/README /boot/overlays/`
+
+`sudo scripts/mkknlimg arch/arm/boot/zImage /boot/$KERNEL.img`
 
 #### Step two: install
 
