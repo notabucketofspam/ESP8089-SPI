@@ -59,8 +59,6 @@ Start with a fresh install of Raspbian.
 
 `echo "esp8089_spi" >> /etc/modules`
 
-`echo "dtparam=spi=on" >> /boot/config.txt`
-
 `echo "dtoverlay=spi1-1cs,cs0_pin=16,cs0_spidev=disabled" >> /boot/config.txt`
 
 `reboot`
@@ -97,6 +95,8 @@ moderately high-value resistors so as not to interfere during normal operation.
 [https://static.abstore.pl/design/accounts/soyter/img/dokumentacje/esp8089-driver-release-desc_v1-9-2_english.pdf](https://static.abstore.pl/design/accounts/soyter/img/dokumentacje/esp8089-driver-release-desc_v1-9-2_english.pdf)
 
 [https://pinout.xyz/pinout/spi](https://pinout.xyz/pinout/spi)
+
+[https://ralimtek.com/raspberry%20pi/electronics/software/raspberry_pi_secondary_sd_card/](https://ralimtek.com/raspberry%20pi/electronics/software/raspberry_pi_secondary_sd_card/)
 
 [https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf](https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf)
 
