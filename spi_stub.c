@@ -265,10 +265,6 @@ struct spi_device* sif_platform_register_board_info(void) {
 }
 #endif
 
-static int esp_ack_int = 0;
-module_param(esp_ack_int, int, 0);
-MODULE_PARM_DESC(esp_ack_int, "Acknowledge interrupt GPIO number");
-
 int sif_platform_irq_init(void) { 
   int ret;
 
@@ -315,27 +311,21 @@ void sif_platform_target_speed(int high_speed) {
 
 }
 
-#define SDIO_BOOT 1
-
 static int esp_reset_gpio = 0;
 module_param(esp_reset_gpio, int, 0);
 MODULE_PARM_DESC(esp_reset_gpio, "ESP8089 CH_PD GPIO number");
 
 void sif_platform_reset_target(void) {
-//  gpio_request(esp_cs0_pin, "esp_cs0_pin");
-  gpio_request(esp_ack_int, "esp_ack_int");
+  gpio_request(esp_cs0_pin, "esp_cs0_pin");
   gpio_request(esp_reset_gpio, "esp_reset_gpio");
-//  gpio_direction_output(esp_cs0_pin, SDIO_BOOT);
-  gpio_direction_output(esp_ack_int, /*SPI_FREQ == 30000000*/1);
+  gpio_direction_output(esp_cs0_pin, SDIO_BOOT);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
-//  gpio_direction_output(esp_cs0_pin, 0);
-//  gpio_direction_input(esp_ack_int);
-  gpio_free(esp_ack_int);
+  gpio_direction_output(esp_cs0_pin, 0);
   gpio_free(esp_reset_gpio);
-//  gpio_free(esp_cs0_pin);
+  gpio_free(esp_cs0_pin);
 }
 
 void sif_platform_target_poweroff(void) {
@@ -343,21 +333,17 @@ void sif_platform_target_poweroff(void) {
 }
 
 void sif_platform_target_poweron(void) {
-//  gpio_request(esp_cs0_pin, "esp_cs0_pin");
-  gpio_request(esp_ack_int, "esp_ack_int");
+  gpio_request(esp_cs0_pin, "esp_cs0_pin");
   gpio_request(esp_reset_gpio, "esp_reset_gpio");
-//  gpio_direction_output(esp_cs0_pin, SDIO_BOOT);
-  gpio_direction_output(esp_ack_int, /*SPI_FREQ == 30000000*/1);
+  gpio_direction_output(esp_cs0_pin, SDIO_BOOT);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
-//  gpio_direction_output(esp_cs0_pin, 0);
-//  gpio_direction_input(esp_ack_int);
-  gpio_free(esp_ack_int);
+  gpio_direction_output(esp_cs0_pin, 0);
   gpio_free(esp_reset_gpio);
-//  gpio_free(esp_cs0_pin);
+  gpio_free(esp_cs0_pin);
 }
 
 #ifdef ESP_ACK_INTERRUPT
@@ -366,7 +352,7 @@ void sif_platform_ack_interrupt(struct esp_pub *epub) {
 }
 #endif
 
-module_init(esp_spi_init);
-//late_initcall(esp_spi_init);
+//module_init(esp_spi_init);
+late_initcall(esp_spi_init);
 module_exit(esp_spi_exit);
 
