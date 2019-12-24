@@ -85,6 +85,10 @@ Start with a fresh install of Raspbian.
 
 `echo "esp8089_spi" >> /etc/modprobe.d/blacklist`
 
+`echo "mmc_spi" >> /etc/modules`
+
+`echo "of_mmc_spi" >> /etc/modules`
+
 `echo "spi_bcm2835" >> /etc/modules`
 
 `echo "spi_bcm2835aux" >> /etc/modules`
