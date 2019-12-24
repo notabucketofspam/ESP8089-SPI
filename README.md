@@ -53,7 +53,7 @@ TBA
 
 `sudo su`
 
-`echo "options esp8089-spi esp_reset_gpio=13 esp_cs0_pin=16" > /etc/modprobe.d/esp.conf`
+`echo "options esp8089-spi esp_reset_gpio=13 esp_cs0_pin=16 esp_mtdo_int=26" > /etc/modprobe.d/esp.conf`
 
 `echo "esp8089_spi" >> /etc/modprobe.d/blacklist`
 
@@ -82,11 +82,7 @@ ESP8266; in fact, this is what the eagle\_fw\#.h files are.
 
 Upon boot of the host device, the ESP chip is power cycled using the CH\_PD 
 pin \(held low\) and subsequently set to load code over SPI via the MTDO pin 
-\(held high\). Optionally, GPIO0 and GPIO2 can be connected to BCM 26 to ensure 
-the correct boot configuration, but these pins are held high by default by the 
-internal pull-up resistors. Note that, since SPI uses an "active low" 
-configuration for chip select, these pins would have to be be connected with 
-moderately high-value resistors so as not to interfere during normal operation.
+\(held high\).
 
 ## References
 
@@ -100,16 +96,9 @@ moderately high-value resistors so as not to interfere during normal operation.
 
 [https://pinout.xyz/pinout/spi](https://pinout.xyz/pinout/spi)
 
+[https://www.raspberrypi.org/documentation/linux/kernel/building.md](https://www.raspberrypi.org/documentation/linux/kernel/building.md)
+
 [https://ralimtek.com/raspberry%20pi/electronics/software/raspberry_pi_secondary_sd_card/](https://ralimtek.com/raspberry%20pi/electronics/software/raspberry_pi_secondary_sd_card/)
 
 [https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf](https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf)
-
-Table 1-3. Pin Definitions of HSPI (Slave)
-
-| Pin Name | Pin Num | IO   | Function Name |
-| -------- | ------- | ---- | ------------- |
-| MTMS     | 9       | IO14 | HSPICLK       |
-| MTDI     | 10      | IO12 | HSPIQ/MISO    |
-| MTCK     | 12      | IO13 | HSPID/MOSI    |
-| MTDO     | 13      | IO15 | HSPICS        |
 
