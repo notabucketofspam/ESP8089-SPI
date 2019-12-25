@@ -1499,12 +1499,16 @@ int sif_spi_protocol_init(struct spi_device *spi)
   printk("esp8089_spi: %s\n", __func__);
 
   gpio_request(esp_cs0_pin, "esp_cs0_pin");
-for (clock_out = 0; clock_out < 100; clock_out++) {
-    gpio_direction_output(esp_cs0_pin, 1);
+  gpio_direction_output(esp_cs0_pin, 1);
+  gpio_request(21, "clock_out");
+  for (clock_out = 0; clock_out < 500; clock_out++) {
+    gpio_direction_output(21, 0);
     mdelay(1);
-    gpio_direction_output(esp_cs0_pin, 0);
+    gpio_direction_output(21, 0);
     mdelay(1);
   }
+  gpio_direction_output(esp_cs0_pin, 0);
+  gpio_free(21);
 
   do {            
     if( spi_proto_ini_status == 0 ) {
