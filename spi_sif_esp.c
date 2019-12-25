@@ -1502,7 +1502,7 @@ int sif_spi_protocol_init(struct spi_device *spi)
   gpio_direction_output(esp_cs0_pin, 1);
   gpio_request(21, "clock_out");
   for (clock_out = 0; clock_out < 500; clock_out++) {
-    gpio_direction_output(21, 0);
+    gpio_direction_output(21, 1);
     mdelay(1);
     gpio_direction_output(21, 0);
     mdelay(1);
