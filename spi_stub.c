@@ -185,6 +185,8 @@ module_exit(esp_spi_exit);
 #define SPI_FREQ (20000000)                             //  1. 22.5Mhz     2. 45Mhz
 //#define SPI_FREQ (30000000)                             //  1. 22.5Mhz     2. 45Mhz
 
+
+
 //Below are for spi HZ 22.5M
 #if (SPI_FREQ == 30000000)
 
@@ -235,7 +237,7 @@ MODULE_PARM_DESC(esp_cs0_pin, "SPI chip select GPIO number");
 
 #ifdef REGISTER_SPI_BOARD_INFO
 
-#define MAX_SPEED_HZ (80*MHz)
+#define MAX_SPEED_HZ (8*MHz)
 
 static struct spi_master *master;
 static struct spi_device *spi;
