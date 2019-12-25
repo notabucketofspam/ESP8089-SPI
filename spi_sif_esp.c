@@ -1489,8 +1489,6 @@ int sif_spi_write_nosync(struct esp_pub *epub, unsigned char *buf, int len, int 
 
 int sif_spi_protocol_init(struct spi_device *spi)
 {   
-  int clock_pulse; 
-
 	unsigned char spi_proto_ini_status = 0;
   unsigned char rx_buf1[10];
   unsigned char tx_buf1[10];
@@ -1499,13 +1497,9 @@ int sif_spi_protocol_init(struct spi_device *spi)
   memset(dummy_tx_buf,0xff,sizeof(dummy_tx_buf));  
   printk("esp8089_spi: %s\n", __func__);
 
-/* https://e2e.ti.com/support/microcontrollers/hercules/f/312/t/258477?SD-Card-using-SPI-will-not-get-out-of-idle-state */
-  mdelay(100);
-  gpio_request(esp_cs0_pin, "esp_cs0_pin");
+ gpio_request(esp_cs0_pin, "esp_cs0_pin");
   gpio_direction_output(esp_cs0_pin, 1);
-  for (clock_pulse = 0; clock_pulse < 8; clock_pulse++) {
-    spi_write(spi, dummy_tx_buf, 10);
-  }
+  sif_spi_write_raw(spi, dummy_tx_buf, 10);
   gpio_direction_output(esp_cs0_pin, 0);
 
   do {            
