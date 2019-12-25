@@ -247,7 +247,7 @@ static struct spi_board_info spi_device_info = {
   .max_speed_hz = MAX_SPEED_HZ,
   .bus_num = 1,
   .chip_select = 0,
-  .mode = SPI_MODE_1,
+  .mode = SPI_MODE_0,
 }; /* https://www.raspberrypi.org/forums/viewtopic.php?t=245999 */
 
 struct spi_device* sif_platform_register_board_info(void) {
