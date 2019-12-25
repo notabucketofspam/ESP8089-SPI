@@ -303,8 +303,8 @@ struct spi_device* sif_platform_register_board_info(void) {
     }
 
   spi->cs_gpio = esp_cs0_pin;
-  gpio_request(esp_cs0_pin, "esp_cs0_pin");
-  gpio_direction_output(esp_cs0_pin, 0);
+//  gpio_request(esp_cs0_pin, "esp_cs0_pin");
+//  gpio_direction_output(esp_cs0_pin, 0);
 
   return spi;
 }
@@ -395,9 +395,10 @@ void sif_platform_reset_target(void) {
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
   gpio_free(esp_reset_gpio);
+
 #ifdef USE_HSPI
   gpio_direction_output(esp_cs0_pin, 0);
-//  gpio_free(esp_cs0_pin);
+  gpio_free(esp_cs0_pin);
 #endif
   gpio_direction_input(esp_mtdo_int);
   gpio_free(esp_mtdo_int);
@@ -422,9 +423,10 @@ void sif_platform_target_poweron(void) {
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
   gpio_free(esp_reset_gpio);
+
 #ifdef USE_HSPI
   gpio_direction_output(esp_cs0_pin, 0);
-//  gpio_free(esp_cs0_pin);
+  gpio_free(esp_cs0_pin);
 #endif
   gpio_direction_input(esp_mtdo_int);
   gpio_free(esp_mtdo_int);
