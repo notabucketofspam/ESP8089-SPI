@@ -7,8 +7,8 @@ Raspberry Pi Zero.
 
 It is recommended to use an ESP-201 module or a barebones ESP-12F module. A 
 development board such as the NodeMCU can cause unpredictable behavior. It may 
-be advisable to add a 33 Ohm resistor across each pin, but this is untested at 
-the moment.
+be advisable to add a resistor across each pin (33 ~ 200 Ohm), but this is 
+untested at the moment.
 
 #### What pins go where:
 
@@ -81,7 +81,8 @@ ESP8266; in fact, this is what the eagle\_fw\#.h files are.
 
 Upon boot of the host device, the ESP chip is power cycled using the CH\_PD 
 pin \(held low\) and subsequently set to load code over SPI via the MTDO pin 
-\(held high\).
+\(held high\). During this time, GPIO0 must be held high and GPIO2 must be held 
+low to select the correct boot mode.
 
 ## References
 
@@ -97,3 +98,4 @@ pin \(held low\) and subsequently set to load code over SPI via the MTDO pin
 
 [https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf](https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf)
 
+[https://www.espressif.com/sites/default/files/documentation/ESP8266_Pin_List_0.xls](https://www.espressif.com/sites/default/files/documentation/ESP8266_Pin_List_0.xls)
