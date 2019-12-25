@@ -1494,7 +1494,7 @@ int sif_spi_write_async_read_proto(struct spi_device *spi, unsigned char* bufwri
 		.tx_buf		= bufwrite,
 		.len		= size,
 		.bits_per_word	= 8,
-		.speed_hz	= 1000,
+		.speed_hz	= 10000,
 	};
 	struct spi_message msg;
 	int error;
@@ -1519,7 +1519,7 @@ int sif_spi_write_raw_proto(struct spi_device *spi, unsigned char* buf, int size
 		.tx_buf		= buf,
 		.len		= size,
 		.bits_per_word	= 8,
-		.speed_hz	= 1000,
+		.speed_hz	= 10000,
 	};
 	struct spi_message msg;
 
@@ -1543,24 +1543,10 @@ int sif_spi_protocol_init(struct spi_device *spi)
   unsigned char rx_buf1[10];
   unsigned char tx_buf1[10];
   unsigned char dummy_tx_buf[10];
-  int clock_out;
 
   memset(dummy_tx_buf,0xff,sizeof(dummy_tx_buf));  
   printk("esp8089_spi: %s\n", __func__);
-/*
-  gpio_request(esp_cs0_pin, "esp_cs0_pin");
-  gpio_direction_output(esp_cs0_pin, 1);
-  gpio_request(21, "clock_out");
-  for (clock_out = 0; clock_out < 500; clock_out++) {
-    gpio_direction_output(21, 1);
-    mdelay(1);
-    gpio_direction_output(21, 0);
-    mdelay(1);
-  }
-  gpio_direction_output(esp_cs0_pin, 0);
-  gpio_free(esp_cs0_pin);
-  gpio_free(21);
-*/
+
   do {            
     if( spi_proto_ini_status == 0 ) {
 			int fail_count = 0;
