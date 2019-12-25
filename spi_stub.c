@@ -180,11 +180,11 @@ module_init(esp_spi_init);
 module_exit(esp_spi_exit);
 */
 
-#define MHz (8000000)
+#define MHz (1000000)
 
 /* https://www.signal.com.tr/pdf/cat/8n-esp8266_spi_reference_en_v1.0.pdf */
 
-#define SPI_FREQ (1000000)
+#define SPI_FREQ (10000000)
 //#define SPI_FREQ (20000000)                             //  1. 22.5Mhz     2. 45Mhz
 //#define SPI_FREQ (30000000)                             //  1. 22.5Mhz     2. 45Mhz
 
@@ -270,7 +270,7 @@ struct spi_device_id esp_spi_id[] = {
   {"ESP8089_1", 1},
 };
 
-static int esp_cs0_pin = 11;
+static int esp_cs0_pin = 16;
 module_param(esp_cs0_pin, int, 0);
 MODULE_PARM_DESC(esp_cs0_pin, "SPI chip select zero");
 
@@ -302,7 +302,7 @@ struct spi_device* sif_platform_register_board_info(void) {
       printk("esp8089_spi: FAILED to create slave.\n");
     }
 
-//  spi->cs_gpio = esp_cs0_pin;
+  spi->cs_gpio = esp_cs0_pin;
   gpio_request(esp_cs0_pin, "esp_cs0_pin");
   gpio_direction_output(esp_cs0_pin, 0);
 
