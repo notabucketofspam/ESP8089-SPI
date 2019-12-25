@@ -375,7 +375,7 @@ SPI:
   GPIO11  CS
 */
 
-#define USE_HSPI
+//#define USE_HSPI
 
 static int esp_reset_gpio = 13;
 module_param(esp_reset_gpio, int, 0);
