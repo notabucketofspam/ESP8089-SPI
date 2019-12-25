@@ -182,10 +182,10 @@ module_exit(esp_spi_exit);
 
 #define MHz (1000000)
 
+/* https://www.signal.com.tr/pdf/cat/8n-esp8266_spi_reference_en_v1.0.pdf */
+
 #define SPI_FREQ (20000000)                             //  1. 22.5Mhz     2. 45Mhz
 //#define SPI_FREQ (30000000)                             //  1. 22.5Mhz     2. 45Mhz
-
-
 
 //Below are for spi HZ 22.5M
 #if (SPI_FREQ == 30000000)
@@ -213,6 +213,17 @@ module_exit(esp_spi_exit);
 #define BLOCK_R_DATA_RESP_SIZE_1ST          (123+40)   //For each data read resp size, in block read ,max: 123
 #define BLOCK_R_DATA_RESP_SIZE_EACH       (20)   //For each data read resp size, in block read 
 
+#else
+
+#define CMD_RESP_SIZE 1
+#define DATA_RESP_SIZE_R 1
+#define DATA_RESP_SIZE_W 1
+
+#define BLOCK_R_DATA_RESP_SIZE_1ST   1
+#define BLOCK_R_DATA_RESP_SIZE_EACH  1
+#define BLOCK_W_DATA_RESP_SIZE_EACH  1
+#define BLOCK_W_DATA_RESP_SIZE_FINAL 1
+
 #endif
 
 #include "esp_sif.h"
@@ -237,7 +248,7 @@ MODULE_PARM_DESC(esp_cs0_pin, "SPI chip select GPIO number");
 
 #ifdef REGISTER_SPI_BOARD_INFO
 
-#define MAX_SPEED_HZ (8*MHz)
+#define MAX_SPEED_HZ (20*MHz)
 
 static struct spi_master *master;
 static struct spi_device *spi;
@@ -247,7 +258,7 @@ static struct spi_board_info spi_device_info = {
   .max_speed_hz = MAX_SPEED_HZ,
   .bus_num = 1,
   .chip_select = 0,
-  .mode = SPI_MODE_0,
+  .mode = 0,
 }; /* https://www.raspberrypi.org/forums/viewtopic.php?t=245999 */
 
 struct spi_device* sif_platform_register_board_info(void) {
