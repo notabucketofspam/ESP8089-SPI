@@ -162,7 +162,7 @@ int sif_spi_write_then_read(struct spi_device *spi, unsigned char* bufwrite, int
 int sif_spi_write_async_read(struct spi_device *spi, unsigned char* bufwrite,unsigned char* bufread,int size)
 {
 	struct spi_transfer xfer = {
-              .rx_buf		= bufread,
+    .rx_buf		= bufread,
 		.tx_buf		= bufwrite,
 		.len		= size,
 		.bits_per_word	= 8,
@@ -1497,34 +1497,30 @@ int sif_spi_protocol_init(struct spi_device *spi)
 
   printk("esp8089_spi: %s\n", __func__);
 
-        do
-        {            
-                 if( spi_proto_ini_status == 0 )
-                 {
+  do {            
+    if( spi_proto_ini_status == 0 ) {
 			int fail_count = 0;
-                        do
-                        { 
-                                tx_buf1[0]=0x40;
-                                tx_buf1[1]=0x00;
-                                tx_buf1[2]=0x00;
-                                tx_buf1[3]=0x00;
-                                tx_buf1[4]=0x00;
-                                tx_buf1[5]=0x95;
-                                //printf("CMD0 \n");
-  printk("esp8089_spi: %s, %d\n", __FILE__, __LINE__);
-  printk("esp8089_spi: fail_count = %d\n", fail_count);
-                                sif_spi_write_raw(spi, tx_buf1, 6);
-                                sif_spi_write_async_read(spi,dummy_tx_buf, rx_buf1,10);
-                                //mdelay(100);
-  esp_dbg(ESP_DBG_ERROR, "rx:[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x]\n", 
-    rx_buf1[0],rx_buf1[1],rx_buf1[2],rx_buf1[3],rx_buf1[4],rx_buf1[5],rx_buf1[6],rx_buf1[7],rx_buf1[8],rx_buf1[9]);
-                                mdelay(100);
+        do { 
+          tx_buf1[0]=0x40;
+          tx_buf1[1]=0x00;
+          tx_buf1[2]=0x00;
+          tx_buf1[3]=0x00;
+          tx_buf1[4]=0x00;
+          tx_buf1[5]=0x95;
+          //printf("CMD0 \n");
+          printk("esp8089_spi: %s, %d\n", __FILE__, __LINE__);
+          printk("esp8089_spi: fail_count = %d\n", fail_count);
+          sif_spi_write_raw(spi, tx_buf1, 6);
+          sif_spi_write_async_read(spi,dummy_tx_buf, rx_buf1,10);
+          //mdelay(100);
+          esp_dbg(ESP_DBG_ERROR, "rx:[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x]\n", 
+            rx_buf1[0],rx_buf1[1],rx_buf1[2],rx_buf1[3],rx_buf1[4],rx_buf1[5],rx_buf1[6],rx_buf1[7],rx_buf1[8],rx_buf1[9]);
+          mdelay(100);
 				if(++fail_count > 10)
 					return -ETIMEDOUT;
-                        }while( rx_buf1[2] != 0x01 );
-                        //  }while(1);
-                 }
-                else if( spi_proto_ini_status == 1 )
+        } while( rx_buf1[2] != 0x01 );
+        //} while(1);
+    } else if( spi_proto_ini_status == 1 )
                 {
                         tx_buf1[0]=0x45;
                         tx_buf1[1]=0x00;
