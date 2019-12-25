@@ -1508,6 +1508,7 @@ int sif_spi_protocol_init(struct spi_device *spi)
     mdelay(1);
   }
   gpio_direction_output(esp_cs0_pin, 0);
+  gpio_free(esp_cs0_pin);
   gpio_free(21);
 
   do {            
