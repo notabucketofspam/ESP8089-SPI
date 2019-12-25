@@ -1504,6 +1504,7 @@ int sif_spi_protocol_init(struct spi_device *spi)
     spi_write(spi, dummy_tx_buf, 10);
   }
   gpio_direction_output(esp_cs0_pin, 0);
+  mdelay(100);
 
   do {            
     if( spi_proto_ini_status == 0 ) {
