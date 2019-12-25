@@ -385,10 +385,10 @@ void sif_platform_reset_target(void) {
 #ifdef USE_HSPI
   gpio_request(esp_cs0_pin, "esp_cs0_pin");
   gpio_direction_output(esp_cs0_pin, 1);
-#else
+#endif
   gpio_request(esp_mtdo_int, "esp_mtdo_int");
   gpio_direction_output(esp_mtdo_int, 1);
-#endif
+
   gpio_request(esp_reset_gpio, "esp_reset_gpio");
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
@@ -398,10 +398,9 @@ void sif_platform_reset_target(void) {
 #ifdef USE_HSPI
   gpio_direction_output(esp_cs0_pin, 0);
 //  gpio_free(esp_cs0_pin);
-#else
+#endif
   gpio_direction_input(esp_mtdo_int);
   gpio_free(esp_mtdo_int);
-#endif
 }
 
 void sif_platform_target_poweroff(void) {
@@ -412,10 +411,10 @@ void sif_platform_target_poweron(void) {
 #ifdef USE_HSPI
   gpio_request(esp_cs0_pin, "esp_cs0_pin");
   gpio_direction_output(esp_cs0_pin, 1);
-#else
+#endif
   gpio_request(esp_mtdo_int, "esp_mtdo_int");
   gpio_direction_output(esp_mtdo_int, 1);
-#endif
+
   gpio_request(esp_reset_gpio, "esp_reset_gpio");
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 0);
@@ -426,10 +425,9 @@ void sif_platform_target_poweron(void) {
 #ifdef USE_HSPI
   gpio_direction_output(esp_cs0_pin, 0);
 //  gpio_free(esp_cs0_pin);
-#else
+#endif
   gpio_direction_input(esp_mtdo_int);
   gpio_free(esp_mtdo_int);
-#endif
 }
 
 #ifdef ESP_ACK_INTERRUPT

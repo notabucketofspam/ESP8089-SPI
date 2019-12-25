@@ -20,6 +20,7 @@ the moment.
 | BCM 20       | GPIO13         | MOSI             |
 | BCM 21       | GPIO14         | SCLK             |
 | BCM 26       | GPIO0          | esp\_mtdo\_int   |
+| GND          | GPIO2          | boot sel         |
 
 ## Software
 
