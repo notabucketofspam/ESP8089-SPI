@@ -270,7 +270,7 @@ struct spi_device_id esp_spi_id[] = {
   {"ESP8089_1", 1},
 };
 
-static int esp_cs0_pin = 0;
+static int esp_cs0_pin = 11;
 module_param(esp_cs0_pin, int, 0);
 MODULE_PARM_DESC(esp_cs0_pin, "SPI chip select zero");
 
@@ -310,7 +310,7 @@ struct spi_device* sif_platform_register_board_info(void) {
 }
 #endif
 
-static int esp_mtdo_int = 0;
+static int esp_mtdo_int = 26;
 module_param(esp_mtdo_int, int, 0);
 MODULE_PARM_DESC(esp_mtdo_int, "MTDO / interrupt pin");
 
@@ -360,9 +360,24 @@ void sif_platform_target_speed(int high_speed) {
 
 }
 
+/* https://lastminuteengineers.com/esp8266-nodemcu-arduino-tutorial/ 
+
+HSPI:
+  GPIO12  HMISO
+  GPIO13  HMOSI
+  GPIO14  HSCLK
+  GPIO15  HCS
+
+SPI:
+  GPIO6   SCLK
+  GPIO7   MISO
+  GPIO8   MOSI
+  GPIO11  CS
+*/
+
 //#define USE_HSPI
 
-static int esp_reset_gpio = 0;
+static int esp_reset_gpio = 13;
 module_param(esp_reset_gpio, int, 0);
 MODULE_PARM_DESC(esp_reset_gpio, "ESP8089 CH_PD GPIO number");
 
@@ -384,7 +399,7 @@ void sif_platform_reset_target(void) {
   gpio_direction_output(esp_cs0_pin, 0);
 //  gpio_free(esp_cs0_pin);
 #else
-  gpio_direction_output(esp_mtdo_int, 0);
+  gpio_direction_input(esp_mtdo_int);
   gpio_free(esp_mtdo_int);
 #endif
 }
@@ -412,7 +427,7 @@ void sif_platform_target_poweron(void) {
   gpio_direction_output(esp_cs0_pin, 0);
 //  gpio_free(esp_cs0_pin);
 #else
-  gpio_direction_output(esp_mtdo_int, 0);
+  gpio_direction_input(esp_mtdo_int);
   gpio_free(esp_mtdo_int);
 #endif
 }
