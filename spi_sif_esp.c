@@ -1493,14 +1493,18 @@ int sif_spi_protocol_init(struct spi_device *spi)
   unsigned char rx_buf1[10];
   unsigned char tx_buf1[10];
   unsigned char dummy_tx_buf[10];
+  int clock_out;
 
   memset(dummy_tx_buf,0xff,sizeof(dummy_tx_buf));  
   printk("esp8089_spi: %s\n", __func__);
 
- gpio_request(esp_cs0_pin, "esp_cs0_pin");
-  gpio_direction_output(esp_cs0_pin, 1);
-  sif_spi_write_raw(spi, dummy_tx_buf, 10);
-  gpio_direction_output(esp_cs0_pin, 0);
+  gpio_request(esp_cs0_pin, "esp_cs0_pin");
+for (clock_out = 0; clock_out < 100; clock_out++) {
+    gpio_direction_output(esp_cs0_pin, 1);
+    mdelay(1);
+    gpio_direction_output(esp_cs0_pin, 0);
+    mdelay(1);
+  }
 
   do {            
     if( spi_proto_ini_status == 0 ) {
