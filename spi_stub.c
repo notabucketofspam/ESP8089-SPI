@@ -184,7 +184,7 @@ module_exit(esp_spi_exit);
 
 /* https://www.signal.com.tr/pdf/cat/8n-esp8266_spi_reference_en_v1.0.pdf */
 
-#define SPI_FREQ 0
+#define SPI_FREQ (1*MHz)
 //#define SPI_FREQ (20000000)                             //  1. 22.5Mhz     2. 45Mhz
 //#define SPI_FREQ (30000000)                             //  1. 22.5Mhz     2. 45Mhz
 
@@ -216,14 +216,15 @@ module_exit(esp_spi_exit);
 
 #else
 
-#define CMD_RESP_SIZE 1
-#define DATA_RESP_SIZE_R 1
-#define DATA_RESP_SIZE_W 1
+#define CMD_RESP_SIZE 10
+#define DATA_RESP_SIZE_W 128
+#define DATA_RESP_SIZE_R 128
 
-#define BLOCK_R_DATA_RESP_SIZE_1ST   1
-#define BLOCK_R_DATA_RESP_SIZE_EACH  1
-#define BLOCK_W_DATA_RESP_SIZE_EACH  1
-#define BLOCK_W_DATA_RESP_SIZE_FINAL 1
+#define BLOCK_W_DATA_RESP_SIZE_EACH  64
+#define BLOCK_W_DATA_RESP_SIZE_FINAL 64
+
+#define BLOCK_R_DATA_RESP_SIZE_1ST   64
+#define BLOCK_R_DATA_RESP_SIZE_EACH  64
 
 #endif
 
