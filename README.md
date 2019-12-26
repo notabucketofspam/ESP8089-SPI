@@ -15,12 +15,12 @@ untested at the moment.
 | Raspberry Pi | ESP8089        | Function         |
 | ------------ | -------------- | ---------------- |
 | BCM 13       | CH\_PD / EN    | esp\_reset\_gpio |
-| BCM 16       | GPIO15         | esp\_cs0\_pin    |
+| BCM 16       | GPIO15         | esp\_cs2\_pin    |
 | BCM 19       | GPIO12         | MISO             |
 | BCM 20       | GPIO13         | MOSI             |
 | BCM 21       | GPIO14         | SCLK             |
-| BCM 26       | GPIO0          | esp\_mtdo\_int   |
-| GND          | GPIO2          | boot sel         |
+| BCM 26       | GPIO0          | esp\_boot\_int   |
+| GND          | GPIO2          | boot select      |
 
 ## Software
 
@@ -52,7 +52,7 @@ Start with a fresh install of Raspbian.
 
 `sudo su`
 
-`echo "options esp8089-spi esp_reset_gpio=13 esp_cs0_pin=16 esp_mtdo_int=26" > /etc/modprobe.d/esp.conf`
+`echo "options esp8089-spi esp_reset_gpio=13 esp_boot_int=26" > /etc/modprobe.d/esp.conf`
 
 `echo "esp8089_spi" >> /etc/modprobe.d/blacklist`
 
@@ -62,7 +62,7 @@ Start with a fresh install of Raspbian.
 
 `echo "esp8089_spi" >> /etc/modules`
 
-`echo "dtoverlay=spi1-1cs,cs0_pin=16,cs0_spidev=disabled" >> /boot/config.txt`
+`echo "dtoverlay=spi1-3cs,cs2_spidev=disabled" >> /boot/config.txt`
 
 `reboot`
 

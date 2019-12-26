@@ -168,7 +168,7 @@ void sif_platform_target_speed(int high_speed)
 {
 }
 
-#ifdef esp_mtdo_intERRUPT
+#ifdef ESP_ACK_INTERRUPT
 void sif_platform_ack_interrupt(struct esp_pub *epub)
 {
 	sif_platform_irq_clear();
@@ -268,11 +268,12 @@ BLOCK_R_DATA_RESP_SIZE_EACH   -10x+40
 struct spi_device_id esp_spi_id[] = { 
   {"ESP8089_0", 0},
   {"ESP8089_1", 1},
+  {"ESP8089_2", 2},
 };
 
-static int esp_cs0_pin = 16;
-module_param(esp_cs0_pin, int, 0);
-MODULE_PARM_DESC(esp_cs0_pin, "SPI chip select zero");
+static int esp_cs2_pin = 16;
+module_param(esp_cs2_pin, int, 0);
+MODULE_PARM_DESC(esp_cs2_pin, "SPI chip select two");
 
 #ifdef REGISTER_SPI_BOARD_INFO
 
@@ -285,60 +286,54 @@ static struct spi_board_info spi_device_info = {
   .modalias = "esp8089-spi",
   .max_speed_hz = MAX_SPEED_HZ,
   .bus_num = 1,
-  .chip_select = 0,
+  .chip_select = 2,
   .mode = 0,
-}; 
+};
 /* https://www.raspberrypi.org/forums/viewtopic.php?t=245999 */
 
 struct spi_device* sif_platform_register_board_info(void) {
 
   master = spi_busnum_to_master( spi_device_info.bus_num );
-  if( !master ) {
-      printk("esp8089_spi: FAILED to find master.\n");
-  }
+  if( !master )
+    printk("esp8089_spi: FAILED to find master\n");
   
   spi = spi_new_device( master, &spi_device_info );
-  if( !spi ) {
-      printk("esp8089_spi: FAILED to create slave.\n");
-    }
-
-//  spi->cs_gpio = esp_cs0_pin;
-//  gpio_request(esp_cs0_pin, "esp_cs0_pin");
-//  gpio_direction_output(esp_cs0_pin, 0);
+  if( !spi )
+    printk("esp8089_spi: FAILED to create slave\n");
 
   return spi;
 }
 #endif
 
-static int esp_mtdo_int = 26;
-module_param(esp_mtdo_int, int, 0);
-MODULE_PARM_DESC(esp_mtdo_int, "MTDO / interrupt pin");
+static int esp_boot_int = 26;
+module_param(esp_boot_int, int, 0);
+MODULE_PARM_DESC(esp_boot_int, "Boot / interrupt pin");
 
 int sif_platform_irq_init(void) { 
   int ret;
 
 	printk(KERN_ERR "esp8089_spi: %s enter\n", __func__);
 
-	if ( (ret = gpio_request(esp_mtdo_int, "esp_mtdo_int")) != 0) {
+	if ( (ret = gpio_request(esp_boot_int, "esp_boot_int")) != 0) {
 		printk(KERN_ERR "esp8089_spi: request gpio error\n");
 		return ret;
 	}
-	gpio_direction_input(esp_mtdo_int);
+	gpio_direction_input(esp_boot_int);
 
-        sif_platform_irq_clear();
+  sif_platform_irq_clear();
 	sif_platform_irq_mask(1);
 
-        udelay(1);
+  udelay(1);
 
 	return 0;
 }
 
 void sif_platform_irq_deinit(void) {
-	gpio_free(esp_mtdo_int);
+	gpio_free(esp_boot_int);
 }
 
 int sif_platform_get_irq_no(void) { 
-	return gpio_to_irq(esp_mtdo_int);
+	return gpio_to_irq(esp_boot_int);
 } 
 
 int sif_platform_is_irq_occur(void) { 
@@ -383,11 +378,11 @@ MODULE_PARM_DESC(esp_reset_gpio, "ESP8089 CH_PD GPIO number");
 
 void sif_platform_reset_target(void) {
 #ifdef USE_HSPI
-  gpio_request(esp_cs0_pin, "esp_cs0_pin");
-  gpio_direction_output(esp_cs0_pin, 1);
+  gpio_request(esp_cs2_pin, "esp_cs2_pin");
+  gpio_direction_output(esp_cs2_pin, 1);
 #endif
-  gpio_request(esp_mtdo_int, "esp_mtdo_int");
-  gpio_direction_output(esp_mtdo_int, 1);
+  gpio_request(esp_boot_int, "esp_boot_int");
+  gpio_direction_output(esp_boot_int, 1);
 
   gpio_request(esp_reset_gpio, "esp_reset_gpio");
   gpio_direction_output(esp_reset_gpio, 0);
@@ -397,11 +392,11 @@ void sif_platform_reset_target(void) {
   gpio_free(esp_reset_gpio);
 
 #ifdef USE_HSPI
-  gpio_direction_output(esp_cs0_pin, 0);
-  gpio_free(esp_cs0_pin);
+  gpio_direction_output(esp_cs2_pin, 0);
+  gpio_free(esp_cs2_pin);
 #endif
-  gpio_direction_input(esp_mtdo_int);
-  gpio_free(esp_mtdo_int);
+  gpio_direction_input(esp_boot_int);
+  gpio_free(esp_boot_int);
 }
 
 void sif_platform_target_poweroff(void) {
@@ -410,11 +405,11 @@ void sif_platform_target_poweroff(void) {
 
 void sif_platform_target_poweron(void) {
 #ifdef USE_HSPI
-  gpio_request(esp_cs0_pin, "esp_cs0_pin");
-  gpio_direction_output(esp_cs0_pin, 1);
+  gpio_request(esp_cs2_pin, "esp_cs2_pin");
+  gpio_direction_output(esp_cs2_pin, 1);
 #endif
-  gpio_request(esp_mtdo_int, "esp_mtdo_int");
-  gpio_direction_output(esp_mtdo_int, 1);
+  gpio_request(esp_boot_int, "esp_boot_int");
+  gpio_direction_output(esp_boot_int, 1);
 
   gpio_request(esp_reset_gpio, "esp_reset_gpio");
   mdelay(200);
@@ -425,10 +420,10 @@ void sif_platform_target_poweron(void) {
   gpio_free(esp_reset_gpio);
 
 #ifdef USE_HSPI
-  gpio_direction_output(esp_cs0_pin, 0);
-  gpio_free(esp_cs0_pin);
+  gpio_direction_output(esp_cs2_pin, 0);
+  gpio_free(esp_cs2_pin);
 #endif
-  gpio_direction_input(esp_mtdo_int);
+  gpio_direction_input(esp_boot_int);
   gpio_free(esp_mtdo_int);
 }
 
