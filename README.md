@@ -62,7 +62,7 @@ Start with a fresh install of Raspbian.
 
 `echo "esp8089_spi" >> /etc/modules`
 
-`echo "dtoverlay=spi1-3cs,cs2_spidev=disabled" >> /boot/config.txt`
+`echo "dtoverlay=spi1-3cs,cs0_pin=6,cs1_pin=12,cs2_spidev=disabled" >> /boot/config.txt`
 
 `reboot`
 
