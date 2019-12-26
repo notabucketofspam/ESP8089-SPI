@@ -90,7 +90,9 @@ struct spi_device_id esp_spi_id[] = {
   {"ESP8089_0", 0},
   {"ESP8089_1", 1},
   {"ESP8089_2", 2},
+  {},
 };
+MODULE_DEVICE_TABLE(spi, esp_spi_id);
 
 static int esp_cs2_pin = 16;
 module_param(esp_cs2_pin, int, 0);
@@ -206,8 +208,6 @@ SDIO:
   GPIO9   SDD2
   GPIO10  SDD3
   GPIO11  SDCMD
-
-https://lastminuteengineers.com/esp8266-nodemcu-arduino-tutorial/ 
 */
 
 //#define USE_HSPI
