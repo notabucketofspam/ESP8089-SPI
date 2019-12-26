@@ -105,12 +105,14 @@ MODULE_PARM_DESC(esp_cs2_pin, "SPI chip select two");
 static struct spi_master *master;
 static struct spi_device *spi;
 
-static struct spi_board_info spi_device_info = {
-  .modalias = "eagle",
-  .max_speed_hz = MAX_SPEED_HZ,
-  .bus_num = 1,
-  .chip_select = 2,
-  .mode = 0,
+static struct spi_board_info spi_device_info[] = {
+  {
+    .modalias = "eagle",
+    .max_speed_hz = MAX_SPEED_HZ,
+    .bus_num = 1,
+    .chip_select = 2,
+    .mode = 0,
+  },
 };
 
 struct spi_device* sif_platform_register_board_info(void) {
