@@ -1494,7 +1494,7 @@ int sif_spi_write_async_read_proto(struct spi_device *spi, unsigned char* bufwri
 		.tx_buf		= bufwrite,
 		.len		= size,
 		.bits_per_word	= 8,
-		.speed_hz	= 100000, /* Low speed for protocol init only */
+		.speed_hz	= 1000000, /* Low speed for protocol init only */
 	};
 	struct spi_message msg;
 	int error;
@@ -1518,7 +1518,7 @@ int sif_spi_write_raw_proto(struct spi_device *spi, unsigned char* buf, int size
 		.tx_buf		= buf,
 		.len		= size,
 		.bits_per_word	= 8,
-		.speed_hz	= 100000, /* Low speed for protocol init only */
+		.speed_hz	= 1000000, /* Low speed for protocol init only */
 	};
 	struct spi_message msg;
 
