@@ -116,7 +116,7 @@ static struct spi_board_info spi_device_info[] = {
 };
 
 void sif_platform_register_board_info(void) {
-  spi_register_board_info(spi_device_info, ARRAY_SIZE(spi_device_info));
+  //spi_register_board_info(spi_device_info, ARRAY_SIZE(spi_device_info));
 }
 
 struct spi_device* sif_platform_new_device(void) {
