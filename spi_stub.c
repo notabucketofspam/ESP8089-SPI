@@ -265,6 +265,8 @@ BLOCK_R_DATA_RESP_SIZE_EACH   -10x+40
 #include <linux/module.h>
 #include <linux/moduleparam.h>
 
+/* *** *** Board info *** *** */
+
 struct spi_device_id esp_spi_id[] = { 
   {"ESP8089_0", 0},
   {"ESP8089_1", 1},
@@ -305,20 +307,22 @@ struct spi_device* sif_platform_register_board_info(void) {
 }
 #endif
 
-static int esp_boot_int = 26;
-module_param(esp_boot_int, int, 0);
-MODULE_PARM_DESC(esp_boot_int, "Boot / interrupt pin");
+/* *** *** Interrupt *** *** */
+
+static int esp_interrupt = 26;
+module_param(esp_interrupt, int, 0);
+MODULE_PARM_DESC(esp_interrupt, "Interrupt pin");
 
 int sif_platform_irq_init(void) { 
   int ret;
 
 	printk(KERN_ERR "esp8089_spi: %s enter\n", __func__);
 
-	if ( (ret = gpio_request(esp_boot_int, "esp_boot_int")) != 0) {
+	if ( (ret = gpio_request(esp_interrupt, "esp_interrupt")) != 0) {
 		printk(KERN_ERR "esp8089_spi: request gpio error\n");
 		return ret;
 	}
-	gpio_direction_input(esp_boot_int);
+	gpio_direction_input(esp_interrupt);
 
   sif_platform_irq_clear();
 	sif_platform_irq_mask(1);
@@ -329,11 +333,11 @@ int sif_platform_irq_init(void) {
 }
 
 void sif_platform_irq_deinit(void) {
-	gpio_free(esp_boot_int);
+	gpio_free(esp_interrupt);
 }
 
 int sif_platform_get_irq_no(void) { 
-	return gpio_to_irq(esp_boot_int);
+	return gpio_to_irq(esp_interrupt);
 } 
 
 int sif_platform_is_irq_occur(void) { 
@@ -355,8 +359,15 @@ void sif_platform_target_speed(int high_speed) {
 
 }
 
-/* https://lastminuteengineers.com/esp8266-nodemcu-arduino-tutorial/ 
+#ifdef ESP_ACK_INTERRUPT
+void sif_platform_ack_interrupt(struct esp_pub *epub) {
+	sif_platform_irq_clear();
+}
+#endif
 
+/* *** *** Platform power *** *** */
+
+/* 
 HSPI:
   GPIO12  HMISO
   GPIO13  HMOSI
@@ -368,6 +379,16 @@ SPI:
   GPIO7   MISO
   GPIO8   MOSI
   GPIO11  CS
+
+SDIO:
+  GPIO6   SDCLK
+  GPIO7   SDD0
+  GPIO8   SDD1
+  GPIO9   SDD2
+  GPIO10  SDD3
+  GPIO11  SDCMD
+
+https://lastminuteengineers.com/esp8266-nodemcu-arduino-tutorial/ 
 */
 
 //#define USE_HSPI
@@ -381,8 +402,8 @@ void sif_platform_reset_target(void) {
   gpio_request(esp_cs2_pin, "esp_cs2_pin");
   gpio_direction_output(esp_cs2_pin, 1);
 #endif
-  gpio_request(esp_boot_int, "esp_boot_int");
-  gpio_direction_output(esp_boot_int, 1);
+//  gpio_request(esp_interrupt, "esp_interrupt");
+//  gpio_direction_output(esp_interrupt, 1);
 
   gpio_request(esp_reset_gpio, "esp_reset_gpio");
   gpio_direction_output(esp_reset_gpio, 0);
@@ -395,8 +416,8 @@ void sif_platform_reset_target(void) {
   gpio_direction_output(esp_cs2_pin, 0);
   gpio_free(esp_cs2_pin);
 #endif
-  gpio_direction_input(esp_boot_int);
-  gpio_free(esp_boot_int);
+//  gpio_direction_input(esp_interrupt);
+//  gpio_free(esp_interrupt);
 }
 
 void sif_platform_target_poweroff(void) {
@@ -408,8 +429,8 @@ void sif_platform_target_poweron(void) {
   gpio_request(esp_cs2_pin, "esp_cs2_pin");
   gpio_direction_output(esp_cs2_pin, 1);
 #endif
-  gpio_request(esp_boot_int, "esp_boot_int");
-  gpio_direction_output(esp_boot_int, 1);
+//  gpio_request(esp_interrupt, "esp_interrupt");
+//  gpio_direction_output(esp_interrupt, 1);
 
   gpio_request(esp_reset_gpio, "esp_reset_gpio");
   mdelay(200);
@@ -423,15 +444,9 @@ void sif_platform_target_poweron(void) {
   gpio_direction_output(esp_cs2_pin, 0);
   gpio_free(esp_cs2_pin);
 #endif
-  gpio_direction_input(esp_boot_int);
-  gpio_free(esp_boot_int);
+//  gpio_direction_input(esp_interrupt);
+//  gpio_free(esp_interrupt);
 }
-
-#ifdef ESP_ACK_INTERRUPT
-void sif_platform_ack_interrupt(struct esp_pub *epub) {
-	sif_platform_irq_clear();
-}
-#endif
 
 //module_init(esp_spi_init);
 late_initcall(esp_spi_init);

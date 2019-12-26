@@ -14,11 +14,12 @@ be advisable to add a resistor across each pin (33 ~ 330 Ohm).
 | Raspberry Pi | ESP8089        | Function         |
 | ------------ | -------------- | ---------------- |
 | BCM 13       | CH\_PD / EN    | esp\_reset\_gpio |
-| BCM 16       | GPIO15         | esp\_cs2\_pin    |
-| BCM 19       | GPIO12         | MISO             |
-| BCM 20       | GPIO13         | MOSI             |
-| BCM 21       | GPIO14         | SCLK             |
-| BCM 26       | GPIO0          | esp\_boot\_int   |
+| BCM 16       | GPIO10         | esp\_cs2\_pin    |
+| BCM 19       | GPIO7          | MISO             |
+| BCM 20       | GPIO11         | MOSI             |
+| BCM 21       | GPIO6          | SCLK             |
+| BCM 26       | GPIO8          | esp\_interrupt   |
+| 3.3V         | GPIO0 & GPIO15 | boot select      |
 | GND          | GPIO2          | boot select      |
 
 ## Software
@@ -51,7 +52,7 @@ Start with a fresh install of Raspbian.
 
 `sudo su`
 
-`echo "options esp8089-spi esp_reset_gpio=13 esp_boot_int=26" > /etc/modprobe.d/esp.conf`
+`echo "options esp8089-spi esp_reset_gpio=13 esp_cs2_pin=16 esp_interrupt=26" > /etc/modprobe.d/esp.conf`
 
 `echo "esp8089_spi" >> /etc/modprobe.d/blacklist`
 
@@ -85,16 +86,25 @@ low to select the correct boot mode.
 
 ## References
 
+[https://pinout.xyz/pinout/spi](https://pinout.xyz/pinout/spi)
+
 [https://hackaday.io/project/8678-rpi-wifi](https://hackaday.io/project/8678-rpi-wifi)
 
 [https://github.com/al177/esp8089](https://github.com/al177/esp8089)
 
 [https://github.com/george-hopkins/esp8089-spi](https://github.com/george-hopkins/esp8089-spi)
 
-[https://static.abstore.pl/design/accounts/soyter/img/dokumentacje/esp8089-driver-release-desc_v1-9-2_english.pdf](https://static.abstore.pl/design/accounts/soyter/img/dokumentacje/esp8089-driver-release-desc_v1-9-2_english.pdf)
+[https://github.com/linux-rockchip/linux-rockchip/tree/mirror/rk3188-rbox-kk/drivers/net/wireless/esp8089](https://github.com/linux-rockchip/linux-rockchip/tree/mirror/rk3188-rbox-kk/drivers/net/wireless/esp8089)
 
-[https://pinout.xyz/pinout/spi](https://pinout.xyz/pinout/spi)
+[https://static.abstore.pl/design/accounts/soyter/img/dokumentacje/esp8089-driver-release-desc_v1-9-2_english.pdf](https://static.abstore.pl/design/accounts/soyter/img/dokumentacje/esp8089-driver-release-desc_v1-9-2_english.pdf)
 
 [https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf](https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf)
 
+[https://www.espressif.com/sites/default/files/documentation/esp8266_hardware_design_guidelines_en.pdf](https://www.espressif.com/sites/default/files/documentation/esp8266_hardware_design_guidelines_en.pdf)
+
+[https://www.terraelectronica.ru/pdf/show?pdf_file=%252Fds%252Fpdf%252FE%252FEspressif_FAQ_EN.pdf](https://www.terraelectronica.ru/pdf/show?pdf_file=%252Fds%252Fpdf%252FE%252FEspressif_FAQ_EN.pdf)
+
+[https://www.signal.com.tr/pdf/cat/8n-esp8266_spi_reference_en_v1.0.pdf](https://www.signal.com.tr/pdf/cat/8n-esp8266_spi_reference_en_v1.0.pdf)
+
 [https://www.espressif.com/sites/default/files/documentation/ESP8266_Pin_List_0.xls](https://www.espressif.com/sites/default/files/documentation/ESP8266_Pin_List_0.xls)
+
