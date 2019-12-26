@@ -7,8 +7,8 @@ Raspberry Pi Zero.
 
 It is recommended to use an ESP-201 module or a barebones ESP-12F module. A 
 development board such as the NodeMCU can cause unpredictable behavior. It may 
-be advisable to add a resistor across each pin (33 ~ 200 Ohm), but this is 
-untested at the moment.
+be advisable to add a resistor across each pin (33 ~ 330 Ohm), particularly 
+MISO, MOSI, and SCLK.
 
 #### What pins go where:
 
