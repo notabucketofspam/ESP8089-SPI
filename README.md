@@ -19,8 +19,8 @@ be advisable to add a resistor across each pin (33 ~ 330 Ohm).
 | BCM 20       | GPIO11         | MOSI             |
 | BCM 21       | GPIO6          | SCLK             |
 | BCM 26       | GPIO8          | esp\_interrupt   |
-| 3.3V         | GPIO0 & GPIO15 | boot select      |
-| GND          | GPIO2          | boot select      |
+| 3.3V         | GPIO2 & GPIO15 | boot select      |
+| GND          | GPIO0          | boot select      |
 
 ## Software
 
@@ -81,12 +81,14 @@ ESP8266; in fact, this is what the eagle\_fw\#.h files are.
 
 Upon boot of the host device, the ESP chip is power cycled using the CH\_PD 
 pin \(held low\) and subsequently set to load code over SPI via GPIO15 
-\(held high\). During this time, GPIO0 must be held high and GPIO2 must be held 
+\(held high\). During this time, GPIO2 must be held high and GPIO0 must be held 
 low to select the correct boot mode.
 
 ## References
 
 [https://pinout.xyz/pinout/spi](https://pinout.xyz/pinout/spi)
+
+[https://lastminuteengineers.com/esp8266-nodemcu-arduino-tutorial/](https://lastminuteengineers.com/esp8266-nodemcu-arduino-tutorial/)
 
 [https://hackaday.io/project/8678-rpi-wifi](https://hackaday.io/project/8678-rpi-wifi)
 
