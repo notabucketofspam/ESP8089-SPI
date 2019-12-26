@@ -105,9 +105,9 @@ MODULE_PARM_DESC(esp_cs2_pin, "SPI chip select two");
 static struct spi_master *master;
 static struct spi_device *spi;
 
-static struct spi_board_info spi_device_info[] = {
+static struct spi_board_info esp_board_spi_devices[] = {
   {
-    .modalias = "esp8089-spi",
+    .modalias = "ESP8089_2",
     .max_speed_hz = MAX_SPEED_HZ,
     .bus_num = 1,
     .chip_select = 2,
@@ -116,14 +116,14 @@ static struct spi_board_info spi_device_info[] = {
 };
 
 void sif_platform_register_board_info(void) {
-  //spi_register_board_info(spi_device_info, ARRAY_SIZE(spi_device_info));
+  //spi_register_board_info(esp_board_spi_devices, ARRAY_SIZE(esp_board_spi_devices));
 }
 
 struct spi_device* sif_platform_new_device(void) {
-  master = spi_busnum_to_master( spi_device_info[0].bus_num );
+  master = spi_busnum_to_master( esp_board_spi_devices[0].bus_num );
   if( !master )
     printk("esp8089_spi: FAILED to find master\n");
-  spi = spi_new_device( master, spi_device_info );
+  spi = spi_new_device( master, esp_board_spi_devices );
   if( !spi )
     printk("esp8089_spi: FAILED to create slave\n");
   return spi;
