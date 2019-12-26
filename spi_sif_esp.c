@@ -1551,6 +1551,12 @@ int sif_spi_protocol_init(struct spi_device *spi)
     if( spi_proto_ini_status == 0 ) {
 			int fail_count = 0;
         do {
+          gpio_request(esp_cs2_pin, "esp_cs2_pin");
+          gpio_direction_output(esp_cs2_pin, 1);
+          spi_write(spi, dummy_tx_buf, 10);
+          gpio_direction_output(esp_cs2_pin, 0);
+          gpio_free(esp_cs2_pin);
+
           tx_buf1[0]=0x40;
           tx_buf1[1]=0x00;
           tx_buf1[2]=0x00;
