@@ -112,7 +112,6 @@ static struct spi_board_info spi_device_info = {
   .chip_select = 2,
   .mode = 0,
 };
-/* https://www.raspberrypi.org/forums/viewtopic.php?t=245999 */
 
 struct spi_device* sif_platform_register_board_info(void) {
 
@@ -120,6 +119,7 @@ struct spi_device* sif_platform_register_board_info(void) {
   if( !master )
     printk("esp8089_spi: FAILED to find master\n");
   
+  spi_register_board_info(spi_device_info, ARRAY_SIZE(spi_device_info));
   spi = spi_new_device( master, &spi_device_info );
   if( !spi )
     printk("esp8089_spi: FAILED to create slave\n");
