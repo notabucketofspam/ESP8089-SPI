@@ -104,7 +104,7 @@ static struct spi_master *master;
 static struct spi_device *spi;
 
 static struct spi_board_info spi_device_info = {
-  .modalias = "esp8089-spi",
+  .modalias = "eagle",
   .max_speed_hz = MAX_SPEED_HZ,
   .bus_num = 1,
   .chip_select = 2,

@@ -2318,25 +2318,25 @@ struct spi_driver esp_spi_dummy_driver = {
 #include <linux/delay.h>
 
 static int __init esp_spi_init(void) {
-#define ESP_WAIT_UP_TIME_MS 11000
-        int err;
-        u64 ver;
-        int retry = 3;
-        bool powerup = false;
-        int edf_ret = 0;
+  #define ESP_WAIT_UP_TIME_MS 11000
+  int err;
+  u64 ver;
+  int retry = 3;
+  bool powerup = false;
+  int edf_ret = 0;
 
   long long sem_timeout = 0;
   
-#ifdef REGISTER_SPI_BOARD_INFO
-  static struct spi_device* spi;
-#endif
+  #ifdef REGISTER_SPI_BOARD_INFO
+    static struct spi_device* spi;
+  #endif
 
   esp_dbg(ESP_DBG_TRACE, "esp8089_spi: %s \n", __func__);
 
-#ifdef DRIVER_VER
-  ver = DRIVER_VER;
-  esp_dbg(ESP_SHOW, "esp8089_spi: EAGLE DRIVER VER %llx\n", ver);
-#endif
+  #ifdef DRIVER_VER
+    ver = DRIVER_VER;
+    esp_dbg(ESP_SHOW, "esp8089_spi: EAGLE DRIVER VER %llx\n", ver);
+  #endif
 
   edf_ret = esp_debugfs_init();
 
@@ -2386,7 +2386,6 @@ static int __init esp_spi_init(void) {
 
   if (!powerup) {
     esp_dbg(ESP_DBG_ERROR, "esp8089_spi: eagle spi can not power up!\n");
-
     err = -ENODEV;
     goto _fail;
   }
@@ -2424,19 +2423,18 @@ static int __init esp_spi_init(void) {
 
   esp_register_early_suspend();
 	esp_wake_unlock();
-#ifdef REQUEST_RTC_IRQ
-	request_rtc_irq();
-#endif
+  #ifdef REQUEST_RTC_IRQ
+	  request_rtc_irq();
+  #endif
 
   printk("esp8089_spi: %s err %d\n", __func__, err);
-
   return err;
 
-_fail:
-  esp_wake_unlock();
-  esp_wakelock_destroy();
-  printk("esp8089_spi: %s err %d\n", __func__, err);
-  return err;
+  _fail:
+    esp_wake_unlock();
+    esp_wakelock_destroy();
+    printk("esp8089_spi: %s err %d\n", __func__, err);
+    return err;
 }
 
 static void __exit esp_spi_exit(void) 
