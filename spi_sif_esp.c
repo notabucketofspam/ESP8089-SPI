@@ -1494,7 +1494,7 @@ int sif_spi_write_async_read_proto(struct spi_device *spi, unsigned char* bufwri
 		.tx_buf		= bufwrite,
 		.len		= size,
 		.bits_per_word	= 8,
-		.speed_hz	= 10000,
+		.speed_hz	= 100000,
 	};
 	struct spi_message msg;
 	int error;
@@ -1519,7 +1519,7 @@ int sif_spi_write_raw_proto(struct spi_device *spi, unsigned char* buf, int size
 		.tx_buf		= buf,
 		.len		= size,
 		.bits_per_word	= 8,
-		.speed_hz	= 10000,
+		.speed_hz	= 100000,
 	};
 	struct spi_message msg;
 
@@ -1544,7 +1544,7 @@ int sif_spi_protocol_init(struct spi_device *spi)
   unsigned char tx_buf1[10];
   unsigned char dummy_tx_buf[10];
 
-//  memset(rx_buf1,0xff,sizeof(rx_buf1));
+  memset(rx_buf1,0xff,sizeof(rx_buf1));
   memset(tx_buf1,0xff,sizeof(tx_buf1));
   memset(dummy_tx_buf,0xff,sizeof(dummy_tx_buf));
   printk("esp8089_spi: %s\n", __func__);
@@ -1562,7 +1562,7 @@ int sif_spi_protocol_init(struct spi_device *spi)
           //printf("CMD0 \n");
           printk("esp8089_spi: %s, %d\n", __FILE__, __LINE__);
           printk("esp8089_spi: fail_count = %d\n", fail_count);
-          sif_spi_write_raw_proto(spi, tx_buf1, 10);
+          sif_spi_write_raw_proto(spi, tx_buf1, 6);
           sif_spi_write_async_read_proto(spi, dummy_tx_buf, rx_buf1, 10);
           //sif_spi_write_async_read_proto(spi,tx_buf1, rx_buf1,10);
           esp_dbg(ESP_DBG_ERROR, "rx:[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x],[0x%02x]\n", 
