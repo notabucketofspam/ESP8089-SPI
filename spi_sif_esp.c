@@ -2358,10 +2358,10 @@ static int __init esp_spi_init(void) {
 
     #ifdef REGISTER_SPI_BOARD_INFO
       spi = sif_platform_new_device();
-      if (spi) 
+      if (spi) {
         printk("esp8089_spi: register board OK\n");
-      if (spi)
         //err = esp_spi_dummy_probe(spi);
+      }
       else
         printk("esp8089_spi: No slave to probe\n");
       if (err) {
@@ -2401,8 +2401,9 @@ static int __init esp_spi_init(void) {
   spi_register_driver(&esp_spi_driver);
 
   #ifdef REGISTER_SPI_BOARD_INFO
-    if (spi)
+    if (spi) {
       //err = esp_spi_probe(spi);
+    }
     else
       printk("esp8089_spi: No slave to probe\n");
     if (err) {
