@@ -120,7 +120,7 @@ void sif_platform_register_board_info(void) {
 }
 
 struct spi_device* sif_platform_new_device(void) {
-  master = spi_busnum_to_master( spi_device_info.bus_num );
+  master = spi_busnum_to_master( spi_device_info[0]->bus_num );
   if( !master )
     printk("esp8089_spi: FAILED to find master\n");
   spi = spi_new_device( master, spi_device_info );
