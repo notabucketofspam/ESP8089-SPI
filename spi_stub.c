@@ -221,8 +221,6 @@ void sif_platform_reset_target(void) {
   gpio_request(esp_cs2_pin, "esp_cs2_pin");
   gpio_direction_output(esp_cs2_pin, 1);
 #endif
-//  gpio_request(esp_interrupt, "esp_interrupt");
-//  gpio_direction_output(esp_interrupt, 1);
 
   gpio_request(esp_reset_gpio, "esp_reset_gpio");
   gpio_direction_output(esp_reset_gpio, 0);
@@ -235,8 +233,6 @@ void sif_platform_reset_target(void) {
   gpio_direction_output(esp_cs2_pin, 0);
   gpio_free(esp_cs2_pin);
 #endif
-//  gpio_direction_input(esp_interrupt);
-//  gpio_free(esp_interrupt);
 }
 
 void sif_platform_target_poweroff(void) {
@@ -248,8 +244,6 @@ void sif_platform_target_poweron(void) {
   gpio_request(esp_cs2_pin, "esp_cs2_pin");
   gpio_direction_output(esp_cs2_pin, 1);
 #endif
-//  gpio_request(esp_interrupt, "esp_interrupt");
-//  gpio_direction_output(esp_interrupt, 1);
 
   gpio_request(esp_reset_gpio, "esp_reset_gpio");
   mdelay(200);
@@ -263,8 +257,6 @@ void sif_platform_target_poweron(void) {
   gpio_direction_output(esp_cs2_pin, 0);
   gpio_free(esp_cs2_pin);
 #endif
-//  gpio_direction_input(esp_interrupt);
-//  gpio_free(esp_interrupt);
 }
 
 //module_init(esp_spi_init);
