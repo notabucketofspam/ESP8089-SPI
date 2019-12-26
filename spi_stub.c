@@ -424,7 +424,7 @@ void sif_platform_target_poweron(void) {
   gpio_free(esp_cs2_pin);
 #endif
   gpio_direction_input(esp_boot_int);
-  gpio_free(esp_mtdo_int);
+  gpio_free(esp_boot_int);
 }
 
 #ifdef ESP_ACK_INTERRUPT
