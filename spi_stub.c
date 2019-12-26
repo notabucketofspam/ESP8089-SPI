@@ -120,12 +120,14 @@ void sif_platform_register_board_info(void) {
 }
 
 struct spi_device* sif_platform_new_device(void) {
-  master = spi_busnum_to_master( esp_board_spi_devices[0].bus_num );
-  if( !master )
+  master = spi_busnum_to_master(esp_board_spi_devices[0].bus_num);
+  if(!master)
     printk("esp8089_spi: FAILED to find master\n");
   spi = spi_new_device( master, esp_board_spi_devices );
-  if( !spi )
+  if(!spi)
     printk("esp8089_spi: FAILED to create slave\n");
+  if(spi_setup(spi))
+    printk("esp8089_spi: FAILED to setup slave.\n");
   return spi;
 }
 #endif

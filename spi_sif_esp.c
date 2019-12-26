@@ -1978,11 +1978,13 @@ int esp_setup_spi(struct spi_device *spi)
 /* https://www.kernel.org/doc/Documentation/spi/spi-summary */
 /* https://linux-sunxi.org/SPIdev */
 
-  //ret = spi_setup(spi);
+/*
+  ret = spi_setup(spi);
   if( ret ){
-        printk("esp8089_spi: FAILED to setup slave.\n");
-        spi_unregister_device( spi );
+    printk("esp8089_spi: FAILED to setup slave.\n");
+    spi_unregister_device( spi );
   }
+*/
 
 	return ret;
 
@@ -2063,7 +2065,7 @@ static int esp_spi_probe(struct spi_device *spi)
 		epub = esp_pub_alloc_mac80211(&spi->dev);
 
         	if (epub == NULL) {
-                	esp_dbg(ESP_DBG_ERROR, "no mem for epub \n");
+                	esp_dbg(ESP_DBG_ERROR, "esp8089_spi: no mem for epub \n");
                 	err = -ENOMEM;
                 	goto _err_dma;
         	}
@@ -2074,7 +2076,7 @@ static int esp_spi_probe(struct spi_device *spi)
 		if (sif_get_ate_config() == 0) {
 			err = ext_gpio_init(epub);
 			if (err) {
-                		esp_dbg(ESP_DBG_ERROR, "ext_irq_work_init failed %d\n", err);
+                		esp_dbg(ESP_DBG_ERROR, "esp8089_spi: ext_irq_work_init failed %d\n", err);
 				goto _err_epub;
 			}
 		}
