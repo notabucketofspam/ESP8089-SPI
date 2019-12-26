@@ -2329,6 +2329,7 @@ static int __init esp_spi_init(void) {
   
   #ifdef REGISTER_SPI_BOARD_INFO
     static struct spi_device* spi;
+    sif_platform_register_board_info();
   #endif
 
   esp_dbg(ESP_DBG_TRACE, "esp8089_spi: %s \n", __func__);
@@ -2356,7 +2357,7 @@ static int __init esp_spi_init(void) {
     }
 
     #ifdef REGISTER_SPI_BOARD_INFO
-      spi = sif_platform_register_board_info();
+      spi = sif_platform_new_device();
       if (spi) 
         printk("esp8089_spi: register board OK\n");
       if (spi)

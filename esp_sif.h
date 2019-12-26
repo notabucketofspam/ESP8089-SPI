@@ -215,7 +215,8 @@ enum if_dummymode {
 };
 
 #ifdef REGISTER_SPI_BOARD_INFO
-struct spi_device* sif_platform_register_board_info(void);
+void sif_platform_register_board_info(void);
+struct spi_device* sif_platform_new_device(void);
 #endif
 
 void sif_dsr(struct spi_device *spi);
