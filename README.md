@@ -80,7 +80,7 @@ chip. These pins can be therefore utilized to load any custom firmware onto an
 ESP8266; in fact, this is what the eagle\_fw\#.h files are.
 
 Upon boot of the host device, the ESP chip is power cycled using the CH\_PD 
-pin \(held low\) and subsequently set to load code over SPI via the MTDO pin 
+pin \(held low\) and subsequently set to load code over SPI via GPIO15 
 \(held high\). During this time, GPIO0 must be held high and GPIO2 must be held 
 low to select the correct boot mode.
 
