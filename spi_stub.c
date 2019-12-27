@@ -127,7 +127,7 @@ struct spi_device* sif_platform_new_device(void) {
   if(!spi)
     printk("esp8089_spi: FAILED to create slave\n");
   if(spi_setup(spi))
-    printk("esp8089_spi: FAILED to setup slave.\n");
+    printk("esp8089_spi: FAILED to setup slave\n");
   return spi;
 }
 #endif
