@@ -72,8 +72,6 @@ Start with a fresh install of Raspbian.
 
 ## How it works
 
-Please note: I have but a very loose grasp on the underlying mechanics of the
-
 The ESP8266 is basically just a rehashed ESP8089, which is a wireless chip 
 commonly used in many Unix-based devices. The ESP8089 is designed to load its 
 firmware over SPI / SDIO when the device in question boots, whereas the ESP8266 
