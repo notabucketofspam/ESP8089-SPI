@@ -5,22 +5,28 @@ Raspberry Pi Zero.
 
 ## Hardware
 
-It is recommended to use an ESP-201 module or a barebones ESP-12F module. A 
-development board such as the NodeMCU can cause unpredictable behavior. It may 
-be advisable to add a resistor across each pin (33 ~ 330 Ohm).
+#### Chip selection
+
+If using an ESP8089, no changes are required to be made to the chip. If using 
+an ESP8266, the SPI flash must first be desoldered. This is most easily done on 
+the ESP-201 variation or the off-brand "CH340G" version (NodeMCU form factor). 
+The SPI flash is the 8-pin SOIC component near the 32-pin QFN die.
 
 #### What pins go where:
 
-| Raspberry Pi | ESP8089        | Function         |
-| ------------ | -------------- | ---------------- |
-| BCM 13       | CH\_PD / EN    | esp\_reset\_gpio |
-| BCM 16       | GPIO10         | esp\_cs2\_pin    |
-| BCM 19       | GPIO7          | MISO             |
-| BCM 20       | GPIO11         | MOSI             |
-| BCM 21       | GPIO6          | SCLK             |
-| BCM 26       | GPIO8          | esp\_interrupt   |
-| 3.3V         | GPIO0 & GPIO15 | boot select      |
-| GND          | GPIO2          | boot select      |
+| Raspberry Pi | ESP8266 / ESP8089      | Function         |
+| ------------ | ---------------------- | ---------------- |
+| BCM 13       | CHIP_EN                | esp\_reset\_gpio |
+| BCM 16       | GPIO10 / SDIO\_DATA\_3 | esp\_cs2\_pin    |
+| BCM 19       | GPIO7 / SDIO\_DATA\_0  | MISO             |
+| BCM 20       | GPIO11 / SDIO\_CMD     | MOSI             |
+| BCM 21       | GPIO6 / SDIO\_CLK      | SCLK             |
+| BCM 26       | GPIO8 / SDIO\_DATA\_1  | esp\_interrupt   |
+| 3.3V         | GPIO15 / MTDO          | boot select      |
+| 3.3V         | GPIO0                  | boot select      |
+| GND          | GPIO2                  | boot select      |
+
+It may be advisable to add a resistor across each IO pin (33 ~ 330 Ohm).
 
 ## Software
 
@@ -77,7 +83,8 @@ firmware over SPI / SDIO when the device in question boots, whereas the ESP8266
 is intended to load firmware off of the integrated SPI flash component. The 
 pins used for this operation, though, are exposed on most varieties of the 
 chip. These pins can be therefore utilized to load any custom firmware onto an 
-ESP8266; in fact, this is what the eagle\_fw\#.h files are.
+ESP8266; in fact, this is what the eagle\_fw\#.h files are. The SPI 
+flash must first be removed to do this.
 
 Upon boot of the host device, the ESP chip is power cycled using the CH\_PD 
 pin \(held low\) and subsequently set to load code over SPI via GPIO15 
@@ -87,8 +94,6 @@ low to select the correct boot mode.
 ## References
 
 [https://pinout.xyz/pinout/spi](https://pinout.xyz/pinout/spi)
-
-[https://lastminuteengineers.com/esp8266-nodemcu-arduino-tutorial/](https://lastminuteengineers.com/esp8266-nodemcu-arduino-tutorial/)
 
 [https://hackaday.io/project/8678-rpi-wifi](https://hackaday.io/project/8678-rpi-wifi)
 
@@ -103,6 +108,8 @@ low to select the correct boot mode.
 [https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf](https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf)
 
 [https://www.espressif.com/sites/default/files/documentation/esp8266_hardware_design_guidelines_en.pdf](https://www.espressif.com/sites/default/files/documentation/esp8266_hardware_design_guidelines_en.pdf)
+
+[http://gamma.spb.ru/images/pdf/esp8089_datasheet_en.pdf](http://gamma.spb.ru/images/pdf/esp8089_datasheet_en.pdf)
 
 [https://www.terraelectronica.ru/pdf/show?pdf_file=%252Fds%252Fpdf%252FE%252FEspressif_FAQ_EN.pdf](https://www.terraelectronica.ru/pdf/show?pdf_file=%252Fds%252Fpdf%252FE%252FEspressif_FAQ_EN.pdf)
 
