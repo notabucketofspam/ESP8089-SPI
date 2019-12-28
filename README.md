@@ -5,8 +5,6 @@ Raspberry Pi Zero.
 
 ## Hardware
 
-#### Chip selection
-
 If using an ESP8089, no changes are required to be made to the chip. If using 
 an ESP8266, the SPI flash must first be desoldered. This is most easily done on 
 the ESP-201 variation or the off-brand "CH340G" version (NodeMCU form factor). 
