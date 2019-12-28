@@ -94,9 +94,9 @@ struct spi_device_id esp_spi_id[] = {
 };
 MODULE_DEVICE_TABLE(spi, esp_spi_id);
 
-static int esp_cs2_pin = 16;
-module_param(esp_cs2_pin, int, 0);
-MODULE_PARM_DESC(esp_cs2_pin, "SPI chip select two");
+static int esp_cs0_pin = 16;
+module_param(esp_cs0_pin, int, 0);
+MODULE_PARM_DESC(esp_cs0_pin, "SPI chip select zero");
 
 #ifdef REGISTER_SPI_BOARD_INFO
 
@@ -107,10 +107,10 @@ static struct spi_device *spi;
 
 static struct spi_board_info esp_board_spi_devices[] = {
   {
-    .modalias = "ESP8089_2",
+    .modalias = "ESP8089_0",
     .max_speed_hz = MAX_SPEED_HZ,
     .bus_num = 1,
-    .chip_select = 2,
+    .chip_select = 0,
     .mode = 0,
   },
 };
@@ -214,29 +214,17 @@ SDIO:
   GPIO11  SDCMD
 */
 
-//#define USE_HSPI
-
 static int esp_reset_gpio = 13;
 module_param(esp_reset_gpio, int, 0);
-MODULE_PARM_DESC(esp_reset_gpio, "ESP8089 CH_PD GPIO number");
+MODULE_PARM_DESC(esp_reset_gpio, "ESP8089 CHIP_EN GPIO number");
 
 void sif_platform_reset_target(void) {
-#ifdef USE_HSPI
-  gpio_request(esp_cs2_pin, "esp_cs2_pin");
-  gpio_direction_output(esp_cs2_pin, 1);
-#endif
-
   gpio_request(esp_reset_gpio, "esp_reset_gpio");
   gpio_direction_output(esp_reset_gpio, 0);
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
   gpio_free(esp_reset_gpio);
-
-#ifdef USE_HSPI
-  gpio_direction_output(esp_cs2_pin, 0);
-  gpio_free(esp_cs2_pin);
-#endif
 }
 
 void sif_platform_target_poweroff(void) {
@@ -244,11 +232,6 @@ void sif_platform_target_poweroff(void) {
 }
 
 void sif_platform_target_poweron(void) {
-#ifdef USE_HSPI
-  gpio_request(esp_cs2_pin, "esp_cs2_pin");
-  gpio_direction_output(esp_cs2_pin, 1);
-#endif
-
   gpio_request(esp_reset_gpio, "esp_reset_gpio");
   mdelay(200);
   gpio_direction_output(esp_reset_gpio, 0);
@@ -256,11 +239,6 @@ void sif_platform_target_poweron(void) {
   gpio_direction_output(esp_reset_gpio, 1);
   mdelay(200);
   gpio_free(esp_reset_gpio);
-
-#ifdef USE_HSPI
-  gpio_direction_output(esp_cs2_pin, 0);
-  gpio_free(esp_cs2_pin);
-#endif
 }
 
 //module_init(esp_spi_init);

@@ -15,7 +15,7 @@ The SPI flash is the 8-pin SOIC component near the 32-pin QFN die.
 | Raspberry Pi | ESP8266 / ESP8089      | Function         |
 | ------------ | ---------------------- | ---------------- |
 | BCM 13       | CHIP_EN                | esp\_reset\_gpio |
-| BCM 16       | GPIO10 / SDIO\_DATA\_3 | esp\_cs2\_pin    |
+| BCM 16       | GPIO10 / SDIO\_DATA\_3 | esp\_cs0\_pin    |
 | BCM 19       | GPIO7 / SDIO\_DATA\_0  | MISO             |
 | BCM 20       | GPIO11 / SDIO\_CMD     | MOSI             |
 | BCM 21       | GPIO6 / SDIO\_CLK      | SCLK             |
@@ -56,7 +56,7 @@ Start with a fresh install of Raspbian.
 
 `sudo su`
 
-`echo "options esp8089-spi esp_reset_gpio=13 esp_cs2_pin=16 esp_interrupt=26" > /etc/modprobe.d/esp.conf`
+`echo "options esp8089-spi esp_reset_gpio=13 esp_cs0_pin=16 esp_interrupt=26" > /etc/modprobe.d/esp.conf`
 
 `echo "esp8089_spi" >> /etc/modprobe.d/blacklist`
 
@@ -66,14 +66,13 @@ Start with a fresh install of Raspbian.
 
 `echo "esp8089_spi" >> /etc/modules`
 
-`echo "dtoverlay=spi1-3cs,cs0_pin=6,cs1_pin=12,cs2_spidev=disabled" >> /boot/config.txt`
+`echo "dtoverlay=spi1-1cs,cs0_pin=16,cs0_spidev=disabled" >> /boot/config.txt`
 
 `reboot`
 
 ## How it works
 
 Please note: I have but a very loose grasp on the underlying mechanics of the
-kernel module at base. 
 
 The ESP8266 is basically just a rehashed ESP8089, which is a wireless chip 
 commonly used in many Unix-based devices. The ESP8089 is designed to load its 
@@ -84,7 +83,7 @@ chip. These pins can be therefore utilized to load any custom firmware onto an
 ESP8266; in fact, this is what the eagle\_fw\#.h files are. The SPI 
 flash must first be removed to do this.
 
-Upon boot of the host device, the ESP chip is power cycled using the CH\_PD 
+Upon boot of the host device, the ESP chip is power cycled using the CHIP\_EN 
 pin \(held low\) and subsequently set to load code over SPI via GPIO15 
 \(held high\). During this time, GPIO0 must be held high and GPIO2 must be held 
 low to select the correct boot mode.
