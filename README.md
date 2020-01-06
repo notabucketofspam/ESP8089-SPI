@@ -6,9 +6,11 @@ Raspberry Pi Zero.
 ## Hardware
 
 If using an ESP8089, no changes are required to be made to the chip. If using 
-an ESP8266, the SPI flash must first be desoldered. This is most easily done on 
-the ESP-201 variation or the off-brand "CH340G" version (NodeMCU form factor). 
-The SPI flash is the 8-pin SOIC component near the 32-pin QFN die.
+an ESP8266, the SPI flash must first be desoldered. This is the 8-pin SOIC 
+component near the 32-pin QFN die. The ESP-201 variation works well for this. 
+Alternatively, one can use an off-brand NodeMCU or WeMos D1 Mini, albeit one 
+that doesn't use the ESP-12. 
+
 
 #### What pins go where:
 
@@ -24,7 +26,7 @@ The SPI flash is the 8-pin SOIC component near the 32-pin QFN die.
 | 3.3V         | GPIO0                  | boot select      |
 | GND          | GPIO2                  | boot select      |
 
-It may be advisable to add a resistor across each IO pin (33 ~ 330 Ohm).
+It may be advisable to add a resistor across each I/O pin (33 ~ 330 Ohm).
 
 ## Software
 
