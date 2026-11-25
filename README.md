@@ -34,43 +34,36 @@ Start with a fresh install of Raspbian.
 
 #### Step one: prerequisites
 
-`sudo apt-get -y update`
-
-`sudo apt-get -y upgrade`
-
-`sudo apt-get -y dist-upgrade`
-
-`sudo apt-get -y install raspberrypi-kernel-headers gcc git make`
+```
+sudo apt-get -y update
+sudo apt-get -y upgrade
+sudo apt-get -y dist-upgrade
+sudo apt-get -y install linux-headers-$(uname -r) gcc git make
+```
 
 #### Step two: install
 
-`mkdir ~/esp`
+```
+mkdir ~/esp
+cd ~/esp
+git clone https://github.com/notabucketofspam/ESP8089-SPI.git
+cd ESP8089-SPI
+sudo make install
 
-`cd ~/esp`
-
-`git clone https://github.com/notabucketofspam/ESP8089-SPI.git`
-
-`cd ESP8089-SPI`
-
-`sudo make install`
+sudo mkdir -p /lib/modules/$(uname -r)/extra
+sudo cp esp8089-spi.ko /lib/modules/$(uname -r)/extra/
+sudo depmod -a
+sudo modprobe esp8089-spi
+```
 
 #### Step three: configure
 
-`sudo su`
+```
+echo "options esp8089-spi esp_reset_gpio=13 esp_cs0_pin=16 esp_interrupt=26" | sudo tee /etc/modprobe.d/esp8089.conf
+echo "dtoverlay=spi1-1cs,cs0_pin=16,cs0_spidev=disabled" | sudo tee -a /boot/firmware/config.txt
+```
 
-`echo "options esp8089-spi esp_reset_gpio=13 esp_cs0_pin=16 esp_interrupt=26" > /etc/modprobe.d/esp.conf`
-
-`echo "esp8089_spi" >> /etc/modprobe.d/blacklist`
-
-`echo "spi_bcm2835" >> /etc/modules`
-
-`echo "spi_bcm2835aux" >> /etc/modules`
-
-`echo "esp8089_spi" >> /etc/modules`
-
-`echo "dtoverlay=spi1-1cs,cs0_pin=16,cs0_spidev=disabled" >> /boot/config.txt`
-
-`reboot`
+... and then `reboot`.
 
 ## How it works
 
