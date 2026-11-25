@@ -81,9 +81,12 @@ BLOCK_R_DATA_RESP_SIZE_EACH   -10x+40
 
 #include <linux/delay.h>
 #include <linux/gpio.h>
+#include <linux/gpio/consumer.h>
+#include <linux/gpio/driver.h>
 #include <linux/module.h>
 #include <linux/moduleparam.h>
 #include <linux/platform_device.h>
+#include <linux/version.h>
 
 /* *** *** Board info *** *** */
 
@@ -174,31 +177,123 @@ static int esp_interrupt = 26;
 module_param(esp_interrupt, int, 0);
 MODULE_PARM_DESC(esp_interrupt, "Interrupt pin");
 
+static int esp_interrupt_gpio = -1;
+static int esp_interrupt_irq = -ENXIO;
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 8, 0)
+static int esp_gpio_match_bcm_chip(struct gpio_chip *gc, const void *data)
+{
+	return gc->label &&
+	       (!strcmp(gc->label, "pinctrl-bcm2835") ||
+		!strcmp(gc->label, "pinctrl-bcm2711") ||
+		!strcmp(gc->label, "pinctrl-rp1"));
+}
+
+static int esp_resolve_gpio(int pin)
+{
+	struct gpio_device *gdev;
+	int base;
+
+	if (pin < 0)
+		return -EINVAL;
+
+	gdev = gpio_device_find(NULL, esp_gpio_match_bcm_chip);
+	if (!gdev) {
+		printk(KERN_ERR "esp8089_spi: failed to find Raspberry Pi GPIO chip\n");
+		return -ENODEV;
+	}
+
+	base = gpio_device_get_base(gdev);
+	gpio_device_put(gdev);
+	if (base < 0)
+		return base;
+
+	/* Accept raw BCM pin numbers (e.g. 13, 16, 26) or pre-offset global numbers. */
+	if (base > 0 && pin >= base)
+		return pin;
+
+	return base + pin;
+}
+#else
+static int esp_resolve_gpio(int pin)
+{
+	return pin;
+}
+#endif
+
+static struct gpio_desc *esp_request_gpio_desc(int bcm_pin, const char *label, int *out_gpio)
+{
+	struct gpio_desc *desc;
+	int gpio;
+	int ret;
+
+	gpio = esp_resolve_gpio(bcm_pin);
+	if (gpio < 0)
+		return ERR_PTR(gpio);
+
+	ret = gpio_request(gpio, label);
+	if (ret) {
+		printk(KERN_ERR "esp8089_spi: request gpio %d (%s) error %d\n", gpio, label, ret);
+		return ERR_PTR(ret);
+	}
+
+	desc = gpio_to_desc(gpio);
+	if (!desc) {
+		gpio_free(gpio);
+		printk(KERN_ERR "esp8089_spi: failed to get gpio desc for %d (%s)\n", gpio, label);
+		return ERR_PTR(-ENODEV);
+	}
+
+	*out_gpio = gpio;
+	return desc;
+}
+
 int sif_platform_irq_init(void) { 
-  int ret;
+	struct gpio_desc *desc;
+	int gpio = -1;
+	int ret;
 
 	printk(KERN_ERR "esp8089_spi: %s enter\n", __func__);
 
-	if ( (ret = gpio_request(esp_interrupt, "esp_interrupt")) != 0) {
-		printk(KERN_ERR "esp8089_spi: request gpio error\n");
+	desc = esp_request_gpio_desc(esp_interrupt, "esp_interrupt", &gpio);
+	if (IS_ERR(desc))
+		return PTR_ERR(desc);
+
+	ret = gpiod_direction_input(desc);
+	if (ret) {
+		gpio_free(gpio);
+		printk(KERN_ERR "esp8089_spi: set irq gpio %d input error %d\n", gpio, ret);
 		return ret;
 	}
-	gpio_direction_input(esp_interrupt);
 
-  sif_platform_irq_clear();
+	ret = gpiod_to_irq(desc);
+	if (ret < 0) {
+		gpio_free(gpio);
+		printk(KERN_ERR "esp8089_spi: gpio %d to irq error %d\n", gpio, ret);
+		return ret;
+	}
+
+	esp_interrupt_gpio = gpio;
+	esp_interrupt_irq = ret;
+
+	sif_platform_irq_clear();
 	sif_platform_irq_mask(1);
 
-  udelay(1);
+	udelay(1);
 
 	return 0;
 }
 
 void sif_platform_irq_deinit(void) {
-	gpio_free(esp_interrupt);
+	esp_interrupt_irq = -ENXIO;
+	if (esp_interrupt_gpio >= 0) {
+		gpio_free(esp_interrupt_gpio);
+		esp_interrupt_gpio = -1;
+	}
 }
 
 int sif_platform_get_irq_no(void) { 
-	return gpio_to_irq(esp_interrupt);
+	return esp_interrupt_irq;
 } 
 
 int sif_platform_is_irq_occur(void) { 
@@ -254,30 +349,40 @@ static int esp_reset_gpio = 13;
 module_param(esp_reset_gpio, int, 0);
 MODULE_PARM_DESC(esp_reset_gpio, "ESP8089 CHIP_EN GPIO number");
 
+static void esp_pulse_reset_target(bool pre_delay) {
+  struct gpio_desc *desc;
+  int gpio = -1;
+
+  desc = esp_request_gpio_desc(esp_reset_gpio, "esp_reset_gpio", &gpio);
+  if (IS_ERR(desc))
+    return;
+
+  if (pre_delay)
+    mdelay(200);
+  gpiod_direction_output_raw(desc, 0);
+  mdelay(200);
+  gpiod_direction_output_raw(desc, 1);
+  mdelay(200);
+  gpio_free(gpio);
+}
+
 void sif_platform_reset_target(void) {
-  gpio_request(esp_reset_gpio, "esp_reset_gpio");
-  gpio_direction_output(esp_reset_gpio, 0);
-  mdelay(200);
-  gpio_direction_output(esp_reset_gpio, 1);
-  mdelay(200);
-  gpio_free(esp_reset_gpio);
+  esp_pulse_reset_target(false);
 }
 
 void sif_platform_target_poweroff(void) {
-  if (gpio_request(esp_reset_gpio, "esp_reset_gpio") == 0) {
-    gpio_direction_output(esp_reset_gpio, 0);
-    gpio_free(esp_reset_gpio);
+  struct gpio_desc *desc;
+  int gpio = -1;
+
+  desc = esp_request_gpio_desc(esp_reset_gpio, "esp_reset_gpio", &gpio);
+  if (!IS_ERR(desc)) {
+    gpiod_direction_output_raw(desc, 0);
+    gpio_free(gpio);
   }
 }
 
 void sif_platform_target_poweron(void) {
-  gpio_request(esp_reset_gpio, "esp_reset_gpio");
-  mdelay(200);
-  gpio_direction_output(esp_reset_gpio, 0);
-  mdelay(200);
-  gpio_direction_output(esp_reset_gpio, 1);
-  mdelay(200);
-  gpio_free(esp_reset_gpio);
+  esp_pulse_reset_target(true);
 }
 
 //module_init(esp_spi_init);
