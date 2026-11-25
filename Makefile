@@ -58,34 +58,34 @@ PACKAGE_NAME := $(patsubst "%",%,$(PACKAGE_NAME))
 PACKAGE_VERSION := $(patsubst "%",%,$(PACKAGE_VERSION))
 DKMS_PATH := /usr/src/$(PACKAGE_NAME)-$(PACKAGE_VERSION)/
 
-#EXTRA_CFLAGS += -DDEBUG -DSIP_DEBUG -DDEBUG_FS
+#ccflags-y += -DDEBUG -DSIP_DEBUG -DDEBUG_FS
 
-EXTRA_CFLAGS += -DFAST_TX_STATUS -DRX_SENDUP_SYNC
+ccflags-y += -DFAST_TX_STATUS -DRX_SENDUP_SYNC
 
-EXTRA_CFLAGS += -DKERNEL_IV_WAR -DSIF_DSR_WAR 
+ccflags-y += -DKERNEL_IV_WAR -DSIF_DSR_WAR 
 
-EXTRA_CFLAGS += -DHAS_INIT_DATA
+ccflags-y += -DHAS_INIT_DATA
 
-EXTRA_CFLAGS += -DP2P_CONCURRENT 
+ccflags-y += -DP2P_CONCURRENT 
 
-EXTRA_CFLAGS += -DHAS_FW
+ccflags-y += -DHAS_FW
 
-EXTRA_CFLAGS += -DESP_ACK_INTERRUPT
+ccflags-y += -DESP_ACK_INTERRUPT
 
-EXTRA_CFLAGS += -DESP_USE_SPI
+ccflags-y += -DESP_USE_SPI
 
-EXTRA_CFLAGS += -DREGISTER_SPI_BOARD_INFO
+ccflags-y += -DREGISTER_SPI_BOARD_INFO
 
 ifdef ANDROID
-EXTRA_CFLAGS += -DANDROID
+ccflags-y += -DANDROID
 endif
 
 ifdef P2P_CONCURRENT
-EXTRA_CFLAGS += -DP2P_CONCURRENT
+ccflags-y += -DP2P_CONCURRENT
 endif
 
 ifdef TEST_MODE
-EXTRA_CFLAGS += -DTEST_MODE
+ccflags-y += -DTEST_MODE
 endif
 
 OBJS = esp_debug.o sdio_sif_esp.o spi_sif_esp.o esp_io.o \
@@ -131,6 +131,11 @@ cleandkms:
 	-dkms uninstall $(PACKAGE_NAME)/$(PACKAGE_VERSION)
 	-dkms remove $(PACKAGE_NAME)/$(PACKAGE_VERSION) --all
 	-rm -rf /var/lib/dkms/$(PACKAGE_NAME)/$(PACKAGE_VERSION) $(DKMS_PATH)
+
+ifeq (,$(wildcard $(KBUILD)/Module.symvers))
+KBUILD_MODPOST_WARN ?= 1
+export KBUILD_MODPOST_WARN
+endif
 
 modules:
 	$(MAKE) -C $(KBUILD) M=$(SRC_DIR)

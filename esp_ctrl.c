@@ -479,8 +479,10 @@ int sip_send_ampdu_action(struct esp_pub *epub, u8 action_num, const u8 * addr, 
         switch(action_num) {
         case SIP_AMPDU_RX_START:
                 action->ssn = ssn;
+                fallthrough;
         case SIP_AMPDU_RX_STOP:
                 action->index = index;
+                fallthrough;
         case SIP_AMPDU_TX_OPERATIONAL:
         case SIP_AMPDU_TX_STOP:
                 action->win_size = buf_size;
@@ -741,6 +743,29 @@ int sip_send_set_sta(struct esp_pub *epub, u8 ifidx, u8 set, struct esp_node *no
 	setstacmd->index = index;
 	setstacmd->set = set;
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 28))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+	if(sta->aid == 0)
+		setstacmd->aid = vif->cfg.aid;
+	else
+		setstacmd->aid = sta->aid;
+	memcpy(setstacmd->mac, sta->addr, ETH_ALEN);
+	if(set){
+		if(sta->deflink.ht_cap.ht_supported){
+			if(sta->deflink.ht_cap.cap & IEEE80211_HT_CAP_SGI_20)
+				setstacmd->phymode = ESP_IEEE80211_T_HT20_S;
+			else
+				setstacmd->phymode = ESP_IEEE80211_T_HT20_L;
+			setstacmd->ampdu_factor = sta->deflink.ht_cap.ampdu_factor;
+			setstacmd->ampdu_density = sta->deflink.ht_cap.ampdu_density;
+		} else {
+			if(sta->deflink.supp_rates[IEEE80211_BAND_2GHZ] & (~(u32)CONF_HW_BIT_RATE_11B_MASK)){
+				setstacmd->phymode = ESP_IEEE80211_T_OFDM;
+			} else {
+				setstacmd->phymode = ESP_IEEE80211_T_CCK;
+			}
+		}
+	}
+#else
 	if(sta->aid == 0)
 		setstacmd->aid = vif->bss_conf.aid;
 	else
@@ -762,6 +787,7 @@ int sip_send_set_sta(struct esp_pub *epub, u8 ifidx, u8 set, struct esp_node *no
 			}
 		}
 	}
+#endif
 #else
     setstacmd->aid = node->aid;
     memcpy(setstacmd->mac, node->addr, ETH_ALEN);

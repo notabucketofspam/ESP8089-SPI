@@ -83,6 +83,7 @@ BLOCK_R_DATA_RESP_SIZE_EACH   -10x+40
 #include <linux/gpio.h>
 #include <linux/module.h>
 #include <linux/moduleparam.h>
+#include <linux/platform_device.h>
 
 /* *** *** Board info *** *** */
 
@@ -102,7 +103,7 @@ MODULE_PARM_DESC(esp_cs0_pin, "SPI chip select zero");
 
 #define MAX_SPEED_HZ (20*MHz)
 
-static struct spi_master *master;
+static struct spi_controller *master;
 static struct spi_device *spi;
 
 static struct spi_board_info esp_board_spi_devices[] = {
@@ -115,17 +116,44 @@ static struct spi_board_info esp_board_spi_devices[] = {
   },
 };
 
+static int esp_spi_find_controller_cb(struct device *dev, void *data)
+{
+  struct spi_controller **out = data;
+  char name[16];
+  struct device *child;
+
+  snprintf(name, sizeof(name), "spi%u", esp_board_spi_devices[0].bus_num);
+  child = device_find_child_by_name(dev, name);
+  if (child) {
+    if (child->class && strcmp(child->class->name, "spi_master") == 0) {
+      *out = container_of(child, struct spi_controller, dev);
+      return 1;
+    }
+    put_device(child);
+  }
+  return 0;
+}
+
+static struct spi_controller *esp_spi_find_controller(void)
+{
+  struct spi_controller *ctlr = NULL;
+
+  bus_for_each_dev(&platform_bus_type, NULL, &ctlr, esp_spi_find_controller_cb);
+  return ctlr;
+}
+
 void sif_platform_register_board_info(void) {
   //spi_register_board_info(esp_board_spi_devices, ARRAY_SIZE(esp_board_spi_devices));
 }
 
 struct spi_device* sif_platform_new_device(void) {
-  master = spi_busnum_to_master(esp_board_spi_devices[0].bus_num);
+  master = esp_spi_find_controller();
   if(!master) {
     printk("esp8089_spi: FAILED to find master\n");
     return NULL;
   }
   spi = spi_new_device( master, esp_board_spi_devices );
+  put_device(&master->dev);
   if(!spi) {
     printk("esp8089_spi: FAILED to create slave\n");
     return NULL;

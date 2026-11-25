@@ -83,7 +83,7 @@ static struct sip_trace str;
 #define STRACE_TX_ONE_SHOT_INC() (str.tx_one_shot_overflow++)
 #define STRACE_SHOW(sip)
 #else
-#define esp_sip_dbg(...)
+#define esp_sip_dbg(...) do {} while (0)
 #define STRACE_TX_DATA_INC()
 #define STRACE_TX_CMD_INC()
 #define STRACE_RX_DATA_INC()
@@ -211,10 +211,14 @@ static bool check_ac_tid(u8 *pkt, u8 ac, u8 tid)
 static void sip_recalc_credit_timeout(unsigned long data)
 {
 	struct esp_sip *sip = (struct esp_sip *)data;
-#else
+#elif LINUX_VERSION_CODE < KERNEL_VERSION(6, 16, 0)
 static void sip_recalc_credit_timeout(struct timer_list *list)
 {
 	struct esp_sip *sip = from_timer(sip, list, credit_timer);
+#else
+static void sip_recalc_credit_timeout(struct timer_list *list)
+{
+	struct esp_sip *sip = timer_container_of(sip, list, credit_timer);
 #endif
 
 	esp_dbg(ESP_DBG_ERROR, "rct");
@@ -261,7 +265,11 @@ static void sip_recalc_credit_release(struct esp_sip *sip)
 
 	if (atomic_read(&sip->credit_status) == RECALC_CREDIT_ENABLE) {
 		atomic_set(&sip->credit_status, RECALC_CREDIT_DISABLE);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 15, 0)
 		del_timer_sync(&sip->credit_timer);
+#else
+		timer_delete_sync(&sip->credit_timer);
+#endif
 	} else
 		esp_dbg(ESP_SHOW, "maybe bogus credit");
 }
@@ -615,7 +623,7 @@ static void _sip_rxq_process(struct esp_sip *sip)
         sip_trigger_txq_process(sip);
 }
 
-void sip_rxq_process(struct work_struct *work)
+static void sip_rxq_process(struct work_struct *work)
 {
         struct esp_sip *sip = container_of(work, struct esp_sip, rx_process_work);
 	if (sip == NULL) {
@@ -1167,7 +1175,11 @@ sip_txdoneq_process(struct esp_sip *sip, struct sip_evt_tx_report *tx_report)
                                 tx_info->status.rates[1].idx = -1;
 #endif /* HOST_RC */
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
                                 ieee80211_tx_status(epub->hw, skb);
+#else
+                                ieee80211_tx_status_skb(epub->hw, skb);
+#endif
                                 matchs++;
                                 atomic_dec(&sip->pending_tx_status);
                                 STRACE_RX_TXSTATUS_INC();
@@ -1192,7 +1204,11 @@ sip_txdoneq_process(struct esp_sip *sip)
         struct esp_pub *epub = sip->epub;
         struct sk_buff *skb;
         while ((skb = skb_dequeue(&epub->txdoneq))) {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
                 ieee80211_tx_status(epub->hw, skb);
+#else
+                ieee80211_tx_status_skb(epub->hw, skb);
+#endif
         }
 }
 #endif
@@ -1325,7 +1341,11 @@ _exit:
 #ifndef FAST_TX_NOWAIT 
         skb_queue_tail(&sip->epub->txdoneq, skb);
 #else
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
         ieee80211_tx_status(sip->epub->hw, skb);
+#else
+        ieee80211_tx_status_skb(sip->epub->hw, skb);
+#endif
 #endif
 }
 #endif /* FAST_TX_STATUS */
@@ -1929,7 +1949,11 @@ void sip_detach(struct esp_sip *sip)
 	if (sip == NULL)
 		return ;
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 15, 0)
         del_timer_sync(&sip->credit_timer);
+#else
+        timer_delete_sync(&sip->credit_timer);
+#endif
         sip_free_init_ctrl_buf(sip);
 
         prev_state = atomic_read(&sip->state);

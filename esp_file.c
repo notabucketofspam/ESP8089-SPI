@@ -34,9 +34,11 @@ int esp_readwrite_file(const char *filename, char *rbuf, const char *wbuf, size_
 {
         int ret = 0;
         struct file *filp = (struct file *)-ENOENT;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 14, 0)
         mm_segment_t oldfs;
         oldfs = get_fs();
         set_fs(KERNEL_DS);
+#endif
         do {
                 int mode = (wbuf) ? O_RDWR | O_CREAT : O_RDONLY;
                 filp = filp_open(filename, mode, (S_IRUSR | S_IWUSR));
@@ -61,13 +63,21 @@ int esp_readwrite_file(const char *filename, char *rbuf, const char *wbuf, size_
                 }
 
                 if (wbuf) {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 14, 0)
                         if ( (ret=filp->f_op->write(filp, wbuf, length, &filp->f_pos)) < 0) {
+#else
+                        if ( (ret=kernel_write(filp, wbuf, length, &filp->f_pos)) < 0) {
+#endif
                                 esp_dbg(ESP_DBG_ERROR, "%s: Write %u bytes to file %s error %d\n", __FUNCTION__,
                                         (unsigned int)length, filename, ret);
                                 break;
                         }
                 } else {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 14, 0)
                         if ( (ret=filp->f_op->read(filp, rbuf, length, &filp->f_pos)) < 0) {
+#else
+                        if ( (ret=kernel_read(filp, rbuf, length, &filp->f_pos)) < 0) {
+#endif
                                 esp_dbg(ESP_DBG_ERROR, "%s: Read %u bytes from file %s error %d\n", __FUNCTION__,
                                         (unsigned int)length, filename, ret);
                                 break;
@@ -78,7 +88,9 @@ int esp_readwrite_file(const char *filename, char *rbuf, const char *wbuf, size_
         if (!IS_ERR(filp)) {
                 filp_close(filp, NULL);
         }
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 14, 0)
         set_fs(oldfs);
+#endif
 
         return ret;
 }
@@ -258,7 +270,7 @@ struct esp_init_table_elem esp_init_table[MAX_ATTR_NUM] = {
 	
 };
 
-int esp_atoi(char *str)
+static int esp_atoi(char *str)
 {
         int num = 0;
         int ng_flag = 0;
@@ -275,7 +287,7 @@ int esp_atoi(char *str)
         return ng_flag ? 0-num : num;
 }
 
-void show_esp_init_table(struct esp_init_table_elem *econf)
+static __maybe_unused void show_esp_init_table(struct esp_init_table_elem *econf)
 {
 	int i;
 	for (i = 0; i < MAX_ATTR_NUM; i++)

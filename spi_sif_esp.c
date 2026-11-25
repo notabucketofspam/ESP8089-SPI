@@ -83,7 +83,7 @@ unsigned int crc_ta_8[256]={
                                 };
 
 
-unsigned int crc_cal_by_byte(unsigned char* ptr, int len)
+static unsigned int crc_cal_by_byte(unsigned char* ptr, int len)
 {
     unsigned short crc = 0;
 
@@ -130,7 +130,7 @@ void sif_lock_bus(struct esp_pub *epub)
 {
         EPUB_FUNC_CHECK(epub, _exit);
 
-        spi_bus_lock(EPUB_TO_FUNC(epub)->master);
+        spi_bus_lock(EPUB_TO_FUNC(epub)->controller);
 _exit:
 	return;
 }
@@ -139,12 +139,12 @@ void sif_unlock_bus(struct esp_pub *epub)
 {
         EPUB_FUNC_CHECK(epub, _exit);
 
-        spi_bus_unlock(EPUB_TO_FUNC(epub)->master);
+        spi_bus_unlock(EPUB_TO_FUNC(epub)->controller);
 _exit:
 	return;
 }
 
-int sif_spi_write_then_read(struct spi_device *spi, unsigned char* bufwrite, int sizesend, unsigned char* bufread, int sizeread)
+static __maybe_unused int sif_spi_write_then_read(struct spi_device *spi, unsigned char* bufwrite, int sizesend, unsigned char* bufread, int sizeread)
 {
 	int error;
 
@@ -159,7 +159,7 @@ int sif_spi_write_then_read(struct spi_device *spi, unsigned char* bufwrite, int
 	return 0;
 }
 
-int sif_spi_write_async_read(struct spi_device *spi, unsigned char* bufwrite,unsigned char* bufread,int size)
+static int sif_spi_write_async_read(struct spi_device *spi, unsigned char* bufwrite,unsigned char* bufread,int size)
 {
 	struct spi_transfer xfer = {
     .rx_buf		= bufread,
@@ -184,7 +184,7 @@ int sif_spi_write_async_read(struct spi_device *spi, unsigned char* bufwrite,uns
 	return 0;
 }
 
-int sif_spi_write_raw(struct spi_device *spi, unsigned char* buf, int size)
+static int sif_spi_write_raw(struct spi_device *spi, unsigned char* buf, int size)
 {
 	int err;
 	struct spi_transfer xfer = {
@@ -209,7 +209,7 @@ int sif_spi_write_raw(struct spi_device *spi, unsigned char* buf, int size)
 	return 0;
 }
 
-int sif_spi_read_raw(struct spi_device *spi, unsigned char* buf, int size)
+static int sif_spi_read_raw(struct spi_device *spi, unsigned char* buf, int size)
 {
         memset(buf,0xff,size);
         return sif_spi_write_async_read(spi,buf,buf,size);
@@ -371,7 +371,7 @@ goto_err:
     return err_ret;
 }
 
-int sif_spi_write_blocks(struct spi_device *spi, unsigned int addr,unsigned char *src, int count)
+static int sif_spi_write_blocks(struct spi_device *spi, unsigned int addr,unsigned char *src, int count)
 {
     int err_ret = 0;
     int i,j;
@@ -754,13 +754,13 @@ int sif_spi_write_mix_nosync(struct spi_device *spi, unsigned int addr, unsigned
 
 }
 
-int sif_spi_write_mix_sync(struct spi_device *spi, unsigned int addr, unsigned char *buf, int len, int dummymode) 
+static int sif_spi_write_mix_sync(struct spi_device *spi, unsigned int addr, unsigned char *buf, int len, int dummymode) 
 {
 	int err;
 
-	spi_bus_lock(spi->master);
+	spi_bus_lock(spi->controller);
 	err = sif_spi_write_mix_nosync(spi, addr, buf, len, dummymode);
-	spi_bus_unlock(spi->master);
+	spi_bus_unlock(spi->controller);
 
 	return err;
 }
@@ -1017,7 +1017,7 @@ goto_err:
     return err_ret;
 }
 
-int sif_spi_read_blocks(struct spi_device *spi, unsigned int addr, unsigned char *dst, int count)
+static int sif_spi_read_blocks(struct spi_device *spi, unsigned int addr, unsigned char *dst, int count)
 {
     int err_ret = 0;
     int pos,len;
@@ -1309,13 +1309,13 @@ int sif_spi_read_mix_nosync(struct spi_device *spi, unsigned int addr, unsigned 
 	return 0;
 }
 
-int sif_spi_read_mix_sync(struct spi_device *spi, unsigned int addr, unsigned char *buf, int len, int dummymode)
+static int sif_spi_read_mix_sync(struct spi_device *spi, unsigned int addr, unsigned char *buf, int len, int dummymode)
 {
 	int err;
 	
-	spi_bus_lock(spi->master);
+	spi_bus_lock(spi->controller);
 	err = sif_spi_read_mix_nosync(spi, addr, buf, len, dummymode);
-	spi_bus_unlock(spi->master);
+	spi_bus_unlock(spi->controller);
 
 	return err;
 }
@@ -1487,7 +1487,7 @@ int sif_spi_write_nosync(struct esp_pub *epub, unsigned char *buf, int len, int 
 	return sif_spi_write_mix_nosync(spi, sctrl->slc_window_end_addr - (len), buf, write_len, dummymode);
 }
 
-int sif_spi_write_async_read_proto(struct spi_device *spi, unsigned char* bufwrite,unsigned char* bufread,int size)
+static int sif_spi_write_async_read_proto(struct spi_device *spi, unsigned char* bufwrite,unsigned char* bufread,int size)
 {
 	struct spi_transfer xfer = {
     .rx_buf		= bufread,
@@ -1511,7 +1511,7 @@ int sif_spi_write_async_read_proto(struct spi_device *spi, unsigned char* bufwri
 	return 0;
 }
 
-int sif_spi_write_raw_proto(struct spi_device *spi, unsigned char* buf, int size)
+static int sif_spi_write_raw_proto(struct spi_device *spi, unsigned char* buf, int size)
 {
 	int err;
 	struct spi_transfer xfer = {
@@ -1535,7 +1535,7 @@ int sif_spi_write_raw_proto(struct spi_device *spi, unsigned char* buf, int size
 	return 0;
 }
 
-int sif_spi_protocol_init(struct spi_device *spi)
+static int sif_spi_protocol_init(struct spi_device *spi)
 {
 	unsigned char spi_proto_ini_status = 0;
   unsigned char rx_buf1[10];
@@ -1811,7 +1811,7 @@ static int spi_irq_thread(void *data)
 	return 0;	
 }
 
-int sif_setup_irq_thread(struct spi_device *spi)
+static int sif_setup_irq_thread(struct spi_device *spi)
 {
 	sif_irq_thread = kthread_run(spi_irq_thread, spi, "kspiirqd/eagle");
 	if (IS_ERR(sif_irq_thread)) {
@@ -1929,7 +1929,7 @@ void sif_disable_irq(struct esp_pub *epub)
 }
 
 
-int esp_setup_spi(struct spi_device *spi)
+static int esp_setup_spi(struct spi_device *spi)
 {
   int ret = 0;
 #ifndef ESP_PREALLOC
@@ -2010,7 +2010,7 @@ _err_buf_addr:
 
 
 static int esp_spi_probe(struct spi_device *spi);
-static int esp_spi_remove(struct spi_device *spi); 
+static void esp_spi_remove(struct spi_device *spi); 
 
 static int esp_spi_probe(struct spi_device *spi) 
 {
@@ -2173,7 +2173,7 @@ _err_second_init:
 	return err;
 }
 
-static int esp_spi_remove(struct spi_device *spi) 
+static void esp_spi_remove(struct spi_device *spi) 
 {
         struct esp_spi_ctrl *sctrl = NULL;
 
@@ -2183,7 +2183,7 @@ static int esp_spi_remove(struct spi_device *spi)
 
         if (sctrl == NULL) {
                 esp_dbg(ESP_DBG_ERROR, "esp8089_spi: %s no sctrl\n", __func__);
-                return -EINVAL;
+                return;
         }
 
         do {
@@ -2251,8 +2251,6 @@ static int esp_spi_remove(struct spi_device *spi)
 	spi_set_drvdata(spi,NULL);
 	
         esp_dbg(ESP_DBG_TRACE, "esp8089_spi: eagle spi remove complete\n");
-
-	return 0;
 }
 
 static int esp_spi_suspend(struct device *dev)
@@ -2304,9 +2302,8 @@ static int esp_spi_dummy_probe(struct spi_device *spi)
         return 0;
 }
 
-static int esp_spi_dummy_remove(struct spi_device *spi) 
+static void esp_spi_dummy_remove(struct spi_device *spi) 
 {
-        return 0;
 }
 
 struct spi_driver esp_spi_dummy_driver = {
