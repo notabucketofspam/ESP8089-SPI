@@ -157,8 +157,10 @@ int sip_parse_events(struct esp_sip *sip, u8 *buf)
 
         case SIP_EVT_BOOTUP: {
            	struct sip_evt_bootup2 *bootup_evt = (struct sip_evt_bootup2 *)(buf + SIP_CTRL_HDR_LEN);
-		if (sip->rawbuf)
+		if (sip->rawbuf) {
                 	kfree(sip->rawbuf);
+			sip->rawbuf = NULL;
+		}
 		
 		sip_post_init(sip, bootup_evt);
 		
@@ -695,8 +697,10 @@ int sip_send_loopback_mblk(struct esp_sip *sip, int txpacket_len, int rxpacket_l
         }
 
         ret = sip_cmd_enqueue(sip, skb, ENQUEUE_PRIOR_TAIL);
-        if (ret <0)
+        if (ret < 0) {
+                sip_free_ctrl_skbuff(sip, skb);
                 return ret;
+        }
 
         return 0;
 }

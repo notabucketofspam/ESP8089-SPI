@@ -1858,6 +1858,7 @@ void sif_enable_irq(struct esp_pub *epub)
 	err = sif_setup_irq_thread(spi);
         if (err) {
                 esp_dbg(ESP_DBG_ERROR, "esp8089_spi: %s setup sif irq failed\n", __func__);
+		sif_platform_irq_deinit();
 		return;
 	}
 
@@ -1881,6 +1882,8 @@ void sif_enable_irq(struct esp_pub *epub)
 
         if (err) {
                 esp_dbg(ESP_DBG_ERROR, "esp8089_spi: sif %s failed\n", __func__);
+		kthread_stop(sif_irq_thread);
+		sif_platform_irq_deinit();
 		return ;
 	}
 #ifdef IRQ_WAKE_HOST
@@ -1910,7 +1913,7 @@ void sif_disable_irq(struct esp_pub *epub)
                 return;
         
         while (atomic_read(&sctrl->irq_handling)) {
-                schedule_timeout(HZ / 100);
+                msleep(10);
                 if (i++ >= 400) {
                         esp_dbg(ESP_DBG_ERROR, "esp8089_spi: %s force to stop irq\n", __func__);
                         break;
@@ -2063,9 +2066,9 @@ static int esp_spi_probe(struct spi_device *spi)
         	
 		epub = esp_pub_alloc_mac80211(&spi->dev);
 
-        	if (epub == NULL) {
+        	if (IS_ERR_OR_NULL(epub)) {
                 	esp_dbg(ESP_DBG_ERROR, "esp8089_spi: no mem for epub \n");
-                	err = -ENOMEM;
+                	err = epub ? PTR_ERR(epub) : -ENOMEM;
                 	goto _err_dma;
         	}
         	epub->sif = (void *)sctrl;
@@ -2134,6 +2137,7 @@ _err_dma:
         kfree(sctrl->dma_buffer);
 _err_last:
         kfree(sctrl);
+        sif_sctrl = NULL;
 _err_spi:
 	if (buf_addr) {
 #ifdef ESP_PREALLOC
@@ -2381,6 +2385,12 @@ static int __init esp_spi_init(void) {
 
     esp_dbg(ESP_SHOW, "esp8089_spi: %s ------ RETRY ------ \n", __func__);
 		sif_record_retry_config();
+    #ifdef REGISTER_SPI_BOARD_INFO
+    if (spi) {
+      spi_unregister_device(spi);
+      spi = NULL;
+    }
+    #endif
     spi_unregister_driver(&esp_spi_dummy_driver);
     sif_platform_target_poweroff();
                 
@@ -2399,7 +2409,7 @@ static int __init esp_spi_init(void) {
   sif_sdio_state = ESP_SDIO_STATE_FIRST_INIT;
   sema_init(&esp_powerup_sem, 0);
 
-  spi_register_driver(&esp_spi_driver);
+  err = spi_register_driver(&esp_spi_driver);
 
   #ifdef REGISTER_SPI_BOARD_INFO
     if (spi) {
@@ -2434,6 +2444,13 @@ static int __init esp_spi_init(void) {
   return err;
 
   _fail:
+    #ifdef REGISTER_SPI_BOARD_INFO
+    if (spi) {
+      spi_unregister_device(spi);
+      spi = NULL;
+    }
+    #endif
+    esp_debugfs_exit();
     esp_wake_unlock();
     esp_wakelock_destroy();
     printk("esp8089_spi: %s err %d\n", __func__, err);

@@ -121,13 +121,21 @@ void sif_platform_register_board_info(void) {
 
 struct spi_device* sif_platform_new_device(void) {
   master = spi_busnum_to_master(esp_board_spi_devices[0].bus_num);
-  if(!master)
+  if(!master) {
     printk("esp8089_spi: FAILED to find master\n");
+    return NULL;
+  }
   spi = spi_new_device( master, esp_board_spi_devices );
-  if(!spi)
+  if(!spi) {
     printk("esp8089_spi: FAILED to create slave\n");
-  if(spi_setup(spi))
+    return NULL;
+  }
+  if(spi_setup(spi)) {
     printk("esp8089_spi: FAILED to setup slave\n");
+    spi_unregister_device(spi);
+    spi = NULL;
+    return NULL;
+  }
   return spi;
 }
 #endif
@@ -228,7 +236,10 @@ void sif_platform_reset_target(void) {
 }
 
 void sif_platform_target_poweroff(void) {
-  gpio_direction_output(esp_reset_gpio, 0);
+  if (gpio_request(esp_reset_gpio, "esp_reset_gpio") == 0) {
+    gpio_direction_output(esp_reset_gpio, 0);
+    gpio_free(esp_reset_gpio);
+  }
 }
 
 void sif_platform_target_poweron(void) {

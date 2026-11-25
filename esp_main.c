@@ -198,13 +198,15 @@ static int esp_download_fw(struct esp_pub * epub)
   printk("esp8089_spi: %s\n", __func__);
 
 #ifndef HAS_FW
-
+        {
+        char * esp_fw_name;
         if(sif_get_ate_config() == 1) {
-		char * esp_fw_name = ESP_FW_NAME3;
+		esp_fw_name = ESP_FW_NAME3;
 	} else {
-		char * esp_fw_name = epub->sdio_state == ESP_SDIO_STATE_FIRST_INIT ? ESP_FW_NAME1 : ESP_FW_NAME2;
+		esp_fw_name = epub->sdio_state == ESP_SDIO_STATE_FIRST_INIT ? ESP_FW_NAME1 : ESP_FW_NAME2;
 	}
         ret = esp_request_firmware(&fw_entry, esp_fw_name, epub->dev);
+        }
 
         if (ret)
                 return ret;

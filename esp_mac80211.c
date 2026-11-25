@@ -126,7 +126,7 @@ static int esp_op_start(struct ieee80211_hw *hw)
 
 	if (!epub) {
 		ESP_IEEE80211_DBG(ESP_DBG_ERROR, "%s no epub!\n", __func__);
-		return EINVAL;
+		return -EINVAL;
 	}
 	/*add rfkill poll function*/
 
@@ -218,14 +218,12 @@ static int esp_op_add_interface(struct ieee80211_hw *hw,
 	evif->epub = epub;
 	epub->vif = vif;
 	svif.set = 1;
-	if((1 << svif.index) & epub->vif_slot){
-		ESP_IEEE80211_DBG(ESP_DBG_ERROR, "%s interface %d already used\n", __func__, svif.index);
+	if (svif.index >= ESP_PUB_MAX_VIF) {
+		ESP_IEEE80211_DBG(ESP_DBG_ERROR, "%s only support MAX %d interface\n", __func__, ESP_PUB_MAX_VIF);
 		return -EOPNOTSUPP;
 	}
-	epub->vif_slot |= 1 << svif.index;
-
-	if (svif.index == ESP_PUB_MAX_VIF) {
-		ESP_IEEE80211_DBG(ESP_DBG_ERROR, "%s only support MAX %d interface\n", __func__, ESP_PUB_MAX_VIF);
+	if((1 << svif.index) & epub->vif_slot){
+		ESP_IEEE80211_DBG(ESP_DBG_ERROR, "%s interface %d already used\n", __func__, svif.index);
 		return -EOPNOTSUPP;
 	}
 
@@ -264,6 +262,7 @@ static int esp_op_add_interface(struct ieee80211_hw *hw,
 			return -EOPNOTSUPP;
 	}
 
+	epub->vif_slot |= 1 << svif.index;
 	sip_cmd(epub, SIP_CMD_SETVIF, (u8 *)&svif, sizeof(struct sip_cmd_setvif));
 	return 0;
 }
@@ -402,22 +401,25 @@ static bool beacon_tim_alter(struct sk_buff *beacon)
         remain_len = beacon->len - ((u8 *)mgmt->u.beacon.variable - (u8 *)mgmt + 12);
         p = mgmt->u.beacon.variable;
 
-        while (remain_len > 0) {
-                len = *(++p);
-                if (*p == WLAN_EID_TIM) {       // tim field
-                        tim_end = p + len;
-			tim_count = *(++p);
-			p += 2;
-			//multicast
-			if(tim_count == 0)
-			    *p |= 0x1;
-			if((*p & 0xfe) == 0 && tim_end >= p+1){// we only support 8 sta in this case
-                        	p++;
-				*p = beacon_tim_save(*p);
-			}
+        while (remain_len >= 2) {
+                u8 eid = *p;
+                len = *(p + 1);
+                if (remain_len < 2 + len)
+                        break;
+                if (eid == WLAN_EID_TIM && len >= 4) {       // tim field
+                        tim_end = p + 2 + len;
+                        tim_count = *(p + 2);
+                        p += 4;
+                        //multicast
+                        if(tim_count == 0)
+                            *p |= 0x1;
+                        if((*p & 0xfe) == 0 && tim_end >= p + 2){// we only support 8 sta in this case
+                                p++;
+                                *p = beacon_tim_save(*p);
+                        }
                         return tim_count == 0;
                 }
-                p += (len + 1);
+                p += (2 + len);
                 remain_len -= (2 + len);
         }
 
@@ -489,6 +491,8 @@ static void init_beacon_timer(struct ieee80211_vif *vif)
 	ESP_IEEE80211_DBG(ESP_DBG_OP, " %s enter: beacon interval %x\n", __func__, evif->beacon_interval);
 
 	beacon_tim_init();
+	cycle_beacon_count = 1;
+	init_jiffies = jiffies;
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 28))
 	evif->beacon_timer.expires = init_jiffies + msecs_to_jiffies(cycle_beacon_count * vif->bss_conf.beacon_int*1024/1000);
 #else
@@ -496,8 +500,6 @@ static void init_beacon_timer(struct ieee80211_vif *vif)
 #endif
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
         init_timer(&evif->beacon_timer);  //TBD, not init here...
-	cycle_beacon_count = 1;
-	init_jiffies = jiffies;
 	evif->beacon_timer.data = (unsigned long) vif;
 	evif->beacon_timer.function = drv_handle_beacon;
 #else
@@ -819,8 +821,10 @@ static int esp_op_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
 			}
 		} else {
 			u8 index = key->hw_key_idx - 6;
-			epub->hi_map[index].flag = 0;
-			memset(epub->hi_map[index].mac, 0, ETH_ALEN);
+			if (index < 19) {
+				epub->hi_map[index].flag = 0;
+				memset(epub->hi_map[index].mac, 0, ETH_ALEN);
+			}
 		}
         } else {
 		if(isvalid){
@@ -833,8 +837,10 @@ static int esp_op_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
                                 }
 		} else {
 			u8 index = key->hw_key_idx - 2 - ifidx * 2;
+			if (index < 2) {
 				epub->low_map[ifidx][index].flag = 0;
 				memset(epub->low_map[ifidx][index].mac, 0, ETH_ALEN);
+			}
 		}
         	//key->hw_key_idx = key->keyidx + ifidx * 2 + 1;
         }
@@ -1181,8 +1187,9 @@ int esp_get_exist_rxampdu(struct esp_pub * epub, const u8 *addr, u8 tid)
 			return index;
 		}
 		map &= ~ BIT(i);
-		if(epub->rxampdu_tid[i] == tid && 
+		if(epub->rxampdu_tid[i] == tid && epub->rxampdu_node[i] &&
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 28))
+			epub->rxampdu_node[i]->sta &&
 			memcmp(epub->rxampdu_node[i]->sta->addr, addr, ETH_ALEN) == 0
 #else
 			memcmp(epub->rxampdu_node[i]->addr, addr, ETH_ALEN) == 0
@@ -1193,7 +1200,8 @@ int esp_get_exist_rxampdu(struct esp_pub * epub, const u8 *addr, u8 tid)
 		}
 	}
 
-	epub->rxampdu_map &= ~ BIT(index);
+	if (index >= 0)
+		epub->rxampdu_map &= ~ BIT(index);
 	spin_unlock_bh(&epub->rx_ampdu_lock);
 	return index;
 
@@ -1988,6 +1996,7 @@ struct esp_pub * esp_pub_alloc_mac80211(struct device *dev)
 #endif /* NEW_KERNEL */
 
         if (epub->esp_wkq == NULL) {
+                ieee80211_free_hw(hw);
                 ret = -ENOMEM;
                 return ERR_PTR(ret);
         }
@@ -2276,7 +2285,7 @@ esp_register_mac80211(struct esp_pub *epub)
 	for (idx = 0; idx < 64; idx++) {
                 p2p_addr[0] = wlan_addr[0] | 0x02;
                 p2p_addr[0] ^= idx << 2;
-                if (strncmp(p2p_addr, wlan_addr, 6) != 0)
+                if (memcmp(p2p_addr, wlan_addr, ETH_ALEN) != 0)
                         break;
         }
 

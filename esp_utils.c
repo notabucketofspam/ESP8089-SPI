@@ -223,14 +223,17 @@ bool esp_is_ip_pkt(struct sk_buff *skb)
 			return false;
 		
 		hdrlen = ieee80211_hdrlen(hdr->frame_control);
-		if(ieee80211_has_protected(hdr->frame_control))
+		if(ieee80211_has_protected(hdr->frame_control)) {
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 27))
-                	hdrlen += IEEE80211_SKB_CB(skb)->control.hw_key->iv_len;
+			if (IEEE80211_SKB_CB(skb)->control.hw_key)
+                		hdrlen += IEEE80211_SKB_CB(skb)->control.hw_key->iv_len;
 #else
                 	hdrlen += IEEE80211_SKB_CB(skb)->control.iv_len;
 #endif
+		}
 #ifdef RX_CHECKSUM_TEST
-		atomic_set(&g_iv_len, IEEE80211_SKB_CB(skb)->control.hw_key->iv_len);
+		if (IEEE80211_SKB_CB(skb)->control.hw_key)
+			atomic_set(&g_iv_len, IEEE80211_SKB_CB(skb)->control.hw_key->iv_len);
 #endif
 		if(skb->len < hdrlen + sizeof(struct llc_snap_hdr))
 			return false;

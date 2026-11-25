@@ -307,9 +307,9 @@ int request_init_conf(void)
 	else
         	sprintf(filename, "%s/%s", mod_eagle_path_get(), INIT_CONF_FILE);
 
-	if ((ret=esp_readwrite_file(filename, NULL, NULL, 0)) < 0 || ret > MAX_BUF_LEN) {
+	if ((ret=esp_readwrite_file(filename, NULL, NULL, 0)) < 0 || ret >= MAX_BUF_LEN) {
 		esp_dbg(ESP_DBG_ERROR, "%s: file read length error, ret %d\n", __FUNCTION__, ret);
-		return ret;
+		return ret < 0 ? ret : -EINVAL;
 	} else {
                 length = ret;
         }
@@ -323,17 +323,23 @@ int request_init_conf(void)
 #ifdef INIT_DATA_CONF
 	if ((ret=esp_readwrite_file(filename, conf_buf, NULL, length)) != length) {
 		esp_dbg(ESP_DBG_ERROR, "%s: file read error, ret %d request %d\n", __FUNCTION__, ret, length);
+		ret = -EIO;
 		goto failed;
 	}
 #else
 	length = strlen(INIT_DATA_CONF_BUF);
+	if (length >= MAX_BUF_LEN) {
+		esp_dbg(ESP_DBG_ERROR, "%s: init data conf too long %d\n", __FUNCTION__, length);
+		ret = -EINVAL;
+		goto failed;
+	}
 	strncpy(conf_buf, INIT_DATA_CONF_BUF, length); 
 #endif
 	conf_buf[length] = '\0';
 
 	flag = 0;
 	str_len = 0;
-	for (pbuf = conf_buf; *pbuf != '$' && *pbuf != '\n'; pbuf++) {
+	for (pbuf = conf_buf; *pbuf != '$' && *pbuf != '\n' && *pbuf != '\0'; pbuf++) {
 		if (*pbuf == '=') {
 			flag = 1;
 			*(attr_name+str_len) = '\0';
@@ -347,6 +353,7 @@ int request_init_conf(void)
 			*(num_buf+str_len) = '\0';
 			if((value = esp_atoi(num_buf)) > 255 || value < 0){
 				esp_dbg(ESP_DBG_ERROR, "%s: value is too big", __FUNCTION__);
+				ret = -EINVAL;
 				goto failed;
 			}
 
@@ -381,17 +388,21 @@ int request_init_conf(void)
 		}
 
 		if (flag == 0) {
-			*(attr_name+str_len) = *pbuf;
-			if (++str_len > CONF_ATTR_LEN) {
+			if (str_len >= CONF_ATTR_LEN - 1) {
 				esp_dbg(ESP_DBG_ERROR, "%s: attr len is too long", __FUNCTION__);
+				ret = -EINVAL;
 				goto failed;
 			}
+			*(attr_name+str_len) = *pbuf;
+			str_len++;
 		} else {
-			*(num_buf+str_len) = *pbuf;
-			if (++str_len > CONF_VAL_LEN) {
+			if (str_len >= CONF_VAL_LEN - 1) {
 				esp_dbg(ESP_DBG_ERROR, "%s: value len is too long", __FUNCTION__);
+				ret = -EINVAL;
 				goto failed;
-			}	
+			}
+			*(num_buf+str_len) = *pbuf;
+			str_len++;
 		}
 	}
 

@@ -209,15 +209,12 @@ static bool check_ac_tid(u8 *pkt, u8 ac, u8 tid)
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 static void sip_recalc_credit_timeout(unsigned long data)
-#else
-struct esp_sip *_gsip = NULL;
-static void sip_recalc_credit_timeout(struct timer_list *list)
-#endif
 {
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	struct esp_sip *sip = (struct esp_sip *)data;
 #else
-	struct esp_sip *sip = (struct esp_sip *)list->flags;
+static void sip_recalc_credit_timeout(struct timer_list *list)
+{
+	struct esp_sip *sip = from_timer(sip, list, credit_timer);
 #endif
 
 	esp_dbg(ESP_DBG_ERROR, "rct");
@@ -233,7 +230,6 @@ static void sip_recalc_credit_init(struct esp_sip *sip)
 	sip->credit_timer.data = (unsigned long)sip;
 	sip->credit_timer.function = sip_recalc_credit_timeout;
 #else
-	_gsip = sip;
 	timer_setup(&sip->credit_timer, sip_recalc_credit_timeout, 0);
 #endif
 }
@@ -544,7 +540,7 @@ static bool sip_rx_pkt_process(struct esp_sip * sip, struct sk_buff *skb)
 										a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9], a[10], a[11], a[12], a[13], a[14], a[15]);
 								b0 = memcmp(frame_head + 4, skb->data + 4, 12) == 0;
 								b10 = memcmp(frame_head + 10, skb->data, 6) == 0;
-								b11 = memcpy(frame_head + 11, skb->data, 5) == 0;
+								b11 = memcmp(frame_head + 11, skb->data, 5) == 0;
 								esp_sip_dbg(ESP_DBG_TRACE, "com %d %d %d\n", b0, b10, b11);
 								if(b0 && !b10 && !b11) {
 									have_rxabort = false;
@@ -1555,14 +1551,18 @@ static int esp_add_wmm(struct sk_buff *skb)
 
 	remain_len = skb->len - base_len;
 
-	while (remain_len > 0) {
-		if (*p == 0xdd && *(p+5) == 0x02)      //wmm type
+	while (remain_len >= 2) {
+		len = *(p + 1);
+		if (remain_len < 2 + len) {
+			remain_len = -1;
+			break;
+		}
+		if (*p == 0xdd && len >= 4 && *(p+5) == 0x02)      //wmm type
 			return 0;
 		else if (*p == 0x2d)                   //has ht cap
 			flag = 1;
 
-		len = *(++p);
-		p += (len + 1);
+		p += (len + 2);
 		remain_len -= (len + 2);
 	}
 
@@ -1606,7 +1606,7 @@ static int sip_parse_mac_rx_info(struct esp_sip *sip, struct esp_mac_rx_ctrl * m
 
 	hdr = (struct ieee80211_hdr *)skb->data;
 	if (mac_ctrl->damatch0 == 1 && mac_ctrl->bssidmatch0 == 1        /*match bssid and da, but beacon package contain other bssid*/
-			 && strncmp(hdr->addr2, sip->epub->wl.bssid, ETH_ALEN) == 0) { /* force match addr2 */
+			 && memcmp(hdr->addr2, sip->epub->wl.bssid, ETH_ALEN) == 0) { /* force match addr2 */
 		if (++signal_loop >= SIGNAL_COUNT) {
 			avg_signal += rx_status->signal;
 			avg_signal /= SIGNAL_COUNT;
@@ -1875,6 +1875,7 @@ struct esp_sip * sip_attach(struct esp_pub *epub)
 	}
 
         atomic_set(&sip->state, SIP_PREPARE_BOOT);
+        sip_recalc_credit_init(sip);
      
         return sip;
 
@@ -1924,12 +1925,15 @@ void sip_detach(struct esp_sip *sip)
 #ifndef ESP_PREALLOC
         int po;
 #endif
+        int prev_state;
 	if (sip == NULL)
 		return ;
 
+        del_timer_sync(&sip->credit_timer);
         sip_free_init_ctrl_buf(sip);
 
-        if (atomic_read(&sip->state) == SIP_RUN) {
+        prev_state = atomic_read(&sip->state);
+        if (prev_state == SIP_RUN) {
 
                 sif_disable_target_interrupt(sip->epub);
 
@@ -1961,22 +1965,26 @@ void sip_detach(struct esp_sip *sip)
 #ifdef ESP_PREALLOC
 		esp_put_tx_aggr_buf(&sip->tx_aggr_buf);
 #else
-                po = get_order(SIP_TX_AGGR_BUF_SIZE);
-                free_pages((unsigned long)sip->tx_aggr_buf, po);
-                sip->tx_aggr_buf = NULL;
+                if (sip->tx_aggr_buf) {
+                        po = get_order(SIP_TX_AGGR_BUF_SIZE);
+                        free_pages((unsigned long)sip->tx_aggr_buf, po);
+                        sip->tx_aggr_buf = NULL;
+                }
 #endif
 
                 atomic_set(&sip->state, SIP_INIT);
-        } else if (atomic_read(&sip->state) >= SIP_BOOT && atomic_read(&sip->state) <= SIP_WAIT_BOOTUP) {
+        } else if (prev_state >= SIP_BOOT && prev_state <= SIP_WAIT_BOOTUP) {
 
                 sif_disable_target_interrupt(sip->epub);
                 atomic_set(&sip->state, SIP_STOP);
                 sif_disable_irq(sip->epub);
 
-                if (sip->rawbuf)
+                if (sip->rawbuf) {
                         kfree(sip->rawbuf);
+                        sip->rawbuf = NULL;
+                }
 
-                if (atomic_read(&sip->state) == SIP_SEND_INIT) {
+                if (prev_state == SIP_SEND_INIT) {
                         cancel_work_sync(&sip->rx_process_work);
                         skb_queue_purge(&sip->rxq);
 			mutex_destroy(&sip->rx_mtx);
@@ -1992,9 +2000,32 @@ void sip_detach(struct esp_sip *sip)
                         ieee80211_unregister_hw(sip->epub->hw);
                 }
 #endif
-                        atomic_set(&sip->state, SIP_INIT);
-        } else
-                esp_dbg(ESP_DBG_ERROR, "%s wrong state %d\n", __func__, atomic_read(&sip->state));
+#ifdef ESP_PREALLOC
+		esp_put_tx_aggr_buf(&sip->tx_aggr_buf);
+#else
+                if (sip->tx_aggr_buf) {
+                        po = get_order(SIP_TX_AGGR_BUF_SIZE);
+                        free_pages((unsigned long)sip->tx_aggr_buf, po);
+                        sip->tx_aggr_buf = NULL;
+                }
+#endif
+                atomic_set(&sip->state, SIP_INIT);
+        } else {
+                if (sip->rawbuf) {
+                        kfree(sip->rawbuf);
+                        sip->rawbuf = NULL;
+                }
+#ifdef ESP_PREALLOC
+		esp_put_tx_aggr_buf(&sip->tx_aggr_buf);
+#else
+                if (sip->tx_aggr_buf) {
+                        po = get_order(SIP_TX_AGGR_BUF_SIZE);
+                        free_pages((unsigned long)sip->tx_aggr_buf, po);
+                        sip->tx_aggr_buf = NULL;
+                }
+#endif
+                esp_dbg(ESP_DBG_ERROR, "%s wrong state %d\n", __func__, prev_state);
+        }
 
         kfree(sip);
 }

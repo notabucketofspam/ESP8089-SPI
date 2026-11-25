@@ -465,11 +465,15 @@ int ext_gpio_init(struct esp_pub *epub)
 
 	INIT_WORK(&ext_irq_work, esp_tx_work);
 	mutex_init(&ext_mutex_lock);
+	spin_lock_init(&esp_pending_intr_list.spin_lock);
 
 	ext_epub = epub;
 
-	if (ext_epub == NULL)
+	if (ext_epub == NULL) {
+		destroy_workqueue(ext_irq_wkq);
+		ext_irq_wkq = NULL;
 		return -EINVAL;
+	}
 
 #ifdef EXT_GPIO_OPS
 	register_ext_gpio_ops(&ext_gpio_ops);
