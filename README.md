@@ -38,20 +38,25 @@ Start with a fresh install of Raspbian.
 sudo apt-get -y update
 sudo apt-get -y upgrade
 sudo apt-get -y dist-upgrade
-sudo apt-get -y install linux-headers-$(uname -r) gcc git make
+```
+
+Reboot before continuing.
+
+```
+sudo apt-get -y install linux-headers-$(uname -r) gcc git make build-essential
 ```
 
 #### Step two: install
 
 ```
-mkdir ~/esp
-cd ~/esp
+cd
 git clone https://github.com/notabucketofspam/ESP8089-SPI.git
-cd ESP8089-SPI
-sudo make install
+cd ~/ESP8089-SPI
+make -C /lib/modules/$(uname -r)/build M=$(pwd) clean
+make -C /lib/modules/$(uname -r)/build M=$(pwd) modules
 
 sudo mkdir -p /lib/modules/$(uname -r)/extra
-sudo cp esp8089-spi.ko /lib/modules/$(uname -r)/extra/
+sudo cp esp8089-spi.ko /lib/modules/$(uname -r)/extra/esp8089-spi.ko
 sudo depmod -a
 sudo modprobe esp8089-spi
 ```
