@@ -1920,6 +1920,15 @@ esp_sendup_work(struct work_struct *work)
 
 static const struct ieee80211_ops esp_mac80211_ops = {
         .tx = esp_op_tx,
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 2, 0))
+        .wake_tx_queue = ieee80211_handle_wake_tx_queue,
+#endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 9, 0))
+        .add_chanctx = ieee80211_emulate_add_chanctx,
+        .remove_chanctx = ieee80211_emulate_remove_chanctx,
+        .change_chanctx = ieee80211_emulate_change_chanctx,
+        .switch_vif_chanctx = ieee80211_emulate_switch_vif_chanctx,
+#endif
         .start = esp_op_start,
         .stop = esp_op_stop,
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 39))        
