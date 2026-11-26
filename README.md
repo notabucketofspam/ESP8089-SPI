@@ -79,11 +79,24 @@ sudo raspi-config nonint do_wifi_country US
 
 # set the config options
 echo "options esp8089-spi esp_reset_gpio=13 esp_cs0_pin=16 esp_interrupt=26" | sudo tee /etc/modprobe.d/esp8089.conf
-echo "softdep esp8089-spi pre: spi_bcm2835aux" | sudo tee -a /etc/modprobe.d/esp8089.conf
 echo "dtoverlay=spi1-1cs,cs0_pin=16,cs0_spidev=disabled" | sudo tee -a /boot/firmware/config.txt
 
 # load the module on boot
-echo "esp8089-spi" | sudo tee /etc/modules-load.d/esp8089.conf
+sudo tee /etc/systemd/system/esp8089-load.service > /dev/null <<'EOF'
+[Unit]
+Description=Load ESP8089 SPI Wi-Fi kernel module
+After=systemd-udev-settle.service
+
+[Service]
+Type=exec
+ExecStart=/sbin/modprobe esp8089-spi
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable esp8089-load.service
 ```
 
 ... and then `reboot`.
