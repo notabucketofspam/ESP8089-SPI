@@ -11,7 +11,6 @@ component near the 32-pin QFN die. The ESP-201 variation works well for this.
 Alternatively, one can use an off-brand NodeMCU or WeMos D1 Mini, albeit a 
 version that doesn't use the ESP-12. 
 
-
 #### What pins go where:
 
 | Raspberry Pi    | ESP8266 / ESP8089      | Function         |
@@ -25,12 +24,23 @@ version that doesn't use the ESP-12.
 | 3.3V            | GPIO15 / MTDO          | boot select      |
 | 3.3V            | GPIO0                  | boot select      |
 | GND             | GPIO2                  | boot select      |
+| GND             | GND                    | Common ground    |
 
 It may be advisable to add a resistor across each I/O pin (33 ~ 330 Ohm).
 
 **Note**: a Raspberry Pi cannot power the ESP chip solely via its onboard
 3.3V pins; an external 3.3V power source is required (a linear regulator with
 a 10uF capacitor or two is probably adequate).
+
+#### Regarding the crystal oscillator
+
+Most ESP8266 / ESP8089 boards use a **26 MHz** crystal oscillator, but there's a
+handful that use **40 MHz** instead.
+
+If your ESP board uses 40 MHz, compile this kernel module with:
+```
+make XTAL=40
+```
 
 ## Software
 
@@ -64,9 +74,8 @@ make -C /lib/modules/$(uname -r)/build M=$(pwd) modules
 #### Step three: install and configure
 
 ```
-# actually enable the wifi
-sudo rfkill unblock wifi
-sudo nmcli radio wifi on
+# set the wifi regulatory country code
+sudo raspi-config nonint do_wifi_country US
 
 # put the kernel module where it's supposed to go
 sudo mkdir -p /lib/modules/$(uname -r)/extra
@@ -82,6 +91,12 @@ sudo depmod -a
 ```
 
 ... and then `reboot`.
+
+```
+# actually enable the wifi
+sudo rfkill unblock wifi
+sudo nmcli radio wifi on
+```
 
 ### Some extra steps
 
