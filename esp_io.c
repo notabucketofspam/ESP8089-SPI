@@ -428,6 +428,18 @@ void check_target_id(struct esp_pub *epub)
 #ifdef USE_EXT_GPIO
 			gpio_forbidden |= BIT(gpio_sel & 0xf);
 #endif /* USE_EXT_GPIO */
+#else
+			/*
+			 * In SPI mode the ESP8266 does not assert in-band SDIO_DATA1
+			 * interrupts while CS is idle (ECSI=0), and GPIO2 is strapped
+			 * to GND for SDIO/SPI boot. Use OOB active-low on GPIO8 (SD_DATA1).
+			 */
+			gpio_sel = GEN_GPIO_SEL(8, 3, SDIO_INTR_OOB_LOW_LEVEL, 0x24);
+			low_byte = gpio_sel;
+			high_byte = gpio_sel >> 8;
+#ifdef USE_EXT_GPIO
+			gpio_forbidden |= BIT(gpio_sel & 0xf);
+#endif /* USE_EXT_GPIO */
 #endif /* USE_OOB_INTR */
 
 			if(sif_get_bt_config() == 1 && sif_get_rst_config() != 1){
@@ -497,10 +509,12 @@ void sif_dsr(struct spi_device *spi)
 
        if(sctrl->epub->enable_int  == 1)
        {
+           sif_lock_bus(sctrl->epub);
            sif_read_reg_window(sctrl->epub, SLC_INT_ENA, (u8 *)buf);
            buf[0] &= ~(SLC_RX_EOF_INT_ENA);
            buf[0] |= SLC_FRHOST_BIT2_INT_ENA;
            sif_write_reg_window(sctrl->epub, SLC_INT_ENA, (u8 *)buf);
+           sif_unlock_bus(sctrl->epub);
 
            sctrl->epub->enable_int = 0;
         }
@@ -657,5 +671,6 @@ int sif_get_wakeup_gpio_config(void)
 {
 	return wakeup_gpio;
 }
+
 
 
