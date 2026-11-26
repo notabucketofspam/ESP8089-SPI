@@ -37,10 +37,7 @@ a 10uF capacitor or two is probably adequate).
 Most ESP8266 / ESP8089 boards use a **26 MHz** crystal oscillator, but there's a
 handful that use **40 MHz** instead.
 
-If your ESP board uses 40 MHz, compile this kernel module with:
-```
-make XTAL=40
-```
+If your ESP board uses 40 MHz, compile with the `XTAL=40` flag.
 
 ## Software
 
@@ -57,29 +54,32 @@ sudo apt-get -y dist-upgrade
 Reboot before continuing.
 
 ```
-sudo apt-get -y install linux-headers-$(uname -r) git build-essential
+sudo apt-get -y install linux-headers-rpi-v6 dkms git build-essential
 ```
 
-#### Step two: build
+#### Step two: build / install
 
 ```
 cd ~
 git clone https://github.com/notabucketofspam/ESP8089-SPI.git
 cd ~/ESP8089-SPI
-make
+
+# if your ESP uses 40 MHz, run the line below before you compile:
+# sed -i 's|^MAKE\[0\]=.*|MAKE[0]="make KVERS_UNAME=$kernelver XTAL=40"|' dkms.conf
+
+# compile and install
+sudo make dkms
 ```
 
-#### Step three: install and configure
+#### Step three: configure
 
 ```
 # set the wifi regulatory country code (replace US with your 2-letter code)
 sudo raspi-config nonint do_wifi_country US
 
-# install the kernel module and update module dependencies
-sudo make install
-
 # set the config options
 echo "options esp8089-spi esp_reset_gpio=13 esp_cs0_pin=16 esp_interrupt=26" | sudo tee /etc/modprobe.d/esp8089.conf
+echo "softdep esp8089-spi pre: spi_bcm2835aux" | sudo tee -a /etc/modprobe.d/esp8089.conf
 echo "dtoverlay=spi1-1cs,cs0_pin=16,cs0_spidev=disabled" | sudo tee -a /boot/firmware/config.txt
 
 # load the module on boot
