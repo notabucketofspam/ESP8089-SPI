@@ -137,27 +137,16 @@ low to select the correct boot mode.
 
 ## References
 
-[https://pinout.xyz/pinout/spi](https://pinout.xyz/pinout/spi)
-
-[https://hackaday.io/project/8678-rpi-wifi](https://hackaday.io/project/8678-rpi-wifi)
-
-[https://github.com/al177/esp8089](https://github.com/al177/esp8089)
-
-[https://github.com/george-hopkins/esp8089-spi](https://github.com/george-hopkins/esp8089-spi)
-
-[https://github.com/linux-rockchip/linux-rockchip/tree/mirror/rk3188-rbox-kk/drivers/net/wireless/esp8089](https://github.com/linux-rockchip/linux-rockchip/tree/mirror/rk3188-rbox-kk/drivers/net/wireless/esp8089)
-
-[https://static.abstore.pl/design/accounts/soyter/img/dokumentacje/esp8089-driver-release-desc_v1-9-2_english.pdf](https://static.abstore.pl/design/accounts/soyter/img/dokumentacje/esp8089-driver-release-desc_v1-9-2_english.pdf)
-
-[https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf](https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf)
-
-[https://www.espressif.com/sites/default/files/documentation/esp8266_hardware_design_guidelines_en.pdf](https://www.espressif.com/sites/default/files/documentation/esp8266_hardware_design_guidelines_en.pdf)
-
-[http://gamma.spb.ru/images/pdf/esp8089_datasheet_en.pdf](http://gamma.spb.ru/images/pdf/esp8089_datasheet_en.pdf)
-
-[https://www.terraelectronica.ru/pdf/show?pdf_file=%252Fds%252Fpdf%252FE%252FEspressif_FAQ_EN.pdf](https://www.terraelectronica.ru/pdf/show?pdf_file=%252Fds%252Fpdf%252FE%252FEspressif_FAQ_EN.pdf)
-
-[https://www.signal.com.tr/pdf/cat/8n-esp8266_spi_reference_en_v1.0.pdf](https://www.signal.com.tr/pdf/cat/8n-esp8266_spi_reference_en_v1.0.pdf)
-
-[https://www.espressif.com/sites/default/files/documentation/ESP8266_Pin_List_0.xls](https://www.espressif.com/sites/default/files/documentation/ESP8266_Pin_List_0.xls)
-
+- [Raspberry Pi SPI Pinout](https://pinout.xyz/pinout/spi)
+- [Hackaday | RPi WiFi by ajlitt](https://hackaday.io/project/8678-rpi-wifi)
+- [al177/esp8089](https://github.com/al177/esp8089)
+- [george-hopkins/esp8089-spi](https://github.com/george-hopkins/esp8089-spi)
+- [linux-rockchip esp8089 driver](https://github.com/linux-rockchip/linux-rockchip/tree/mirror/rk3188-rbox-kk/drivers/net/wireless/esp8089)
+- [ESP8089 Driver Release Description V1.9.2](https://www.scribd.com/document/517179971/esp8089-driver-release-desc-v1-9-2-english)
+- [Espressif ESP8266 Technical Reference](https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf)
+- [Espressif ESP8266 Hardware Design Guidelines](https://www.espressif.com/sites/default/files/documentation/esp8266_hardware_design_guidelines_en.pdf)
+- [ESP8089 Datasheet V3.2](http://gamma.spb.ru/images/pdf/esp8089_datasheet_en.pdf)
+- [ESP-FAQ Handbook](https://docs.espressif.com/projects/esp-faq/en/latest/esp-faq-en-master.pdf)
+- [ESP8266 SPI Reference V1.0](https://www.signal.com.tr/pdf/cat/8n-esp8266_spi_reference_en_v1.0.pdf)
+- [ESP8266 Pin List](https://www.espressif.com/sites/default/files/documentation/ESP8266_Pin_List_0.xls)
+- [Espressif ESP8266EX Datasheet V7.1](https://documentation.espressif.com/0a-esp8266ex_datasheet_en.pdf)
