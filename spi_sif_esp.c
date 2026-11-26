@@ -2319,6 +2319,10 @@ struct spi_driver esp_spi_dummy_driver = {
 
 #include <linux/delay.h>
 
+#ifdef REGISTER_SPI_BOARD_INFO
+static struct spi_device *esp_spi_dev = NULL;
+#endif
+
 static int __init esp_spi_init(void) {
   #define ESP_WAIT_UP_TIME_MS 11000
   int err;
@@ -2330,7 +2334,6 @@ static int __init esp_spi_init(void) {
   long long sem_timeout = 0;
   
   #ifdef REGISTER_SPI_BOARD_INFO
-    static struct spi_device* spi;
     sif_platform_register_board_info();
   #endif
 
@@ -2359,10 +2362,10 @@ static int __init esp_spi_init(void) {
     }
 
     #ifdef REGISTER_SPI_BOARD_INFO
-      spi = sif_platform_new_device();
-      if (spi) {
+      esp_spi_dev = sif_platform_new_device();
+      if (esp_spi_dev) {
         printk("esp8089_spi: register board OK\n");
-        //err = esp_spi_dummy_probe(spi);
+        //err = esp_spi_dummy_probe(esp_spi_dev);
       }
       else
         printk("esp8089_spi: No slave to probe\n");
@@ -2383,9 +2386,9 @@ static int __init esp_spi_init(void) {
     esp_dbg(ESP_SHOW, "esp8089_spi: %s ------ RETRY ------ \n", __func__);
 		sif_record_retry_config();
     #ifdef REGISTER_SPI_BOARD_INFO
-    if (spi) {
-      spi_unregister_device(spi);
-      spi = NULL;
+    if (esp_spi_dev) {
+      spi_unregister_device(esp_spi_dev);
+      esp_spi_dev = NULL;
     }
     #endif
     spi_unregister_driver(&esp_spi_dummy_driver);
@@ -2409,8 +2412,8 @@ static int __init esp_spi_init(void) {
   err = spi_register_driver(&esp_spi_driver);
 
   #ifdef REGISTER_SPI_BOARD_INFO
-    if (spi) {
-      //err = esp_spi_probe(spi);
+    if (esp_spi_dev) {
+      //err = esp_spi_probe(esp_spi_dev);
     }
     else
       printk("esp8089_spi: No slave to probe\n");
@@ -2442,9 +2445,9 @@ static int __init esp_spi_init(void) {
 
   _fail:
     #ifdef REGISTER_SPI_BOARD_INFO
-    if (spi) {
-      spi_unregister_device(spi);
-      spi = NULL;
+    if (esp_spi_dev) {
+      spi_unregister_device(esp_spi_dev);
+      esp_spi_dev = NULL;
     }
     #endif
     esp_debugfs_exit();
@@ -2463,6 +2466,12 @@ static void __exit esp_spi_exit(void)
         esp_unregister_early_suspend();
 
 	spi_unregister_driver(&esp_spi_driver);
+#ifdef REGISTER_SPI_BOARD_INFO
+	if (esp_spi_dev) {
+		spi_unregister_device(esp_spi_dev);
+		esp_spi_dev = NULL;
+	}
+#endif
 	
 #ifndef FPGA_DEBUG
 	sif_platform_target_poweroff();
