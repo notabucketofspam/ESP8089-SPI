@@ -14,23 +14,27 @@ version that doesn't use the ESP-12.
 
 #### What pins go where:
 
-| Raspberry Pi | ESP8266 / ESP8089      | Function         |
-| ------------ | ---------------------- | ---------------- |
-| BCM 13       | CHIP_EN                | esp\_reset\_gpio |
-| BCM 16       | GPIO10 / SDIO\_DATA\_3 | esp\_cs0\_pin    |
-| BCM 19       | GPIO7 / SDIO\_DATA\_0  | MISO             |
-| BCM 20       | GPIO11 / SDIO\_CMD     | MOSI             |
-| BCM 21       | GPIO6 / SDIO\_CLK      | SCLK             |
-| BCM 26       | GPIO8 / SDIO\_DATA\_1  | esp\_interrupt   |
-| 3.3V         | GPIO15 / MTDO          | boot select      |
-| 3.3V         | GPIO0                  | boot select      |
-| GND          | GPIO2                  | boot select      |
+| Raspberry Pi    | ESP8266 / ESP8089      | Function         |
+| --------------- | ---------------------- | ---------------- |
+| BCM 13 / Pin 33 | CHIP_EN                | esp\_reset\_gpio |
+| BCM 16 / Pin 36 | GPIO10 / SDIO\_DATA\_3 | esp\_cs0\_pin    |
+| BCM 19 / Pin 35 | GPIO7 / SDIO\_DATA\_0  | MISO             |
+| BCM 20 / Pin 38 | GPIO11 / SDIO\_CMD     | MOSI             |
+| BCM 21 / Pin 40 | GPIO6 / SDIO\_CLK      | SCLK             |
+| BCM 26 / Pin 37 | GPIO8 / SDIO\_DATA\_1  | esp\_interrupt   |
+| 3.3V            | GPIO15 / MTDO          | boot select      |
+| 3.3V            | GPIO0                  | boot select      |
+| GND             | GPIO2                  | boot select      |
 
 It may be advisable to add a resistor across each I/O pin (33 ~ 330 Ohm).
 
+**Note**: a Raspberry Pi cannot power the ESP chip solely via its onboard
+3.3V pins; an external 3.3V power source is required (a linear regulator with
+a 10uF capacitor or two is probably adequate).
+
 ## Software
 
-Start with a fresh install of Raspbian.
+Start with a fresh install of Raspberry Pi OS (tested with kernel `6.18.60+rpt-rpi-v6`).
 
 #### Step one: prerequisites
 
@@ -43,32 +47,53 @@ sudo apt-get -y dist-upgrade
 Reboot before continuing.
 
 ```
-sudo apt-get -y install linux-headers-$(uname -r) gcc git make build-essential
+sudo apt-get -y install linux-headers-$(uname -r) git build-essential
 ```
 
-#### Step two: install
+#### Step two: build
 
 ```
-cd
+cd ~
 git clone https://github.com/notabucketofspam/ESP8089-SPI.git
 cd ~/ESP8089-SPI
 make -C /lib/modules/$(uname -r)/build M=$(pwd) clean
 make -C /lib/modules/$(uname -r)/build M=$(pwd) modules
 
+```
+
+#### Step three: install and configure
+
+```
+# actually enable the wifi
+sudo rfkill unblock wifi
+sudo nmcli radio wifi on
+
+# put the kernel module where it's supposed to go
 sudo mkdir -p /lib/modules/$(uname -r)/extra
 sudo cp esp8089-spi.ko /lib/modules/$(uname -r)/extra/esp8089-spi.ko
-sudo depmod -a
-sudo modprobe esp8089-spi
-```
 
-#### Step three: configure
-
-```
+# set the config options
 echo "options esp8089-spi esp_reset_gpio=13 esp_cs0_pin=16 esp_interrupt=26" | sudo tee /etc/modprobe.d/esp8089.conf
 echo "dtoverlay=spi1-1cs,cs0_pin=16,cs0_spidev=disabled" | sudo tee -a /boot/firmware/config.txt
+
+# load the module on boot
+echo "esp8089-spi" | sudo tee /etc/modules-load.d/esp8089.conf
+sudo depmod -a
 ```
 
 ... and then `reboot`.
+
+### Some extra steps
+
+Scan nearby networks:
+```
+sudo iw dev wlan0 scan | grep -E "SSID:|signal:"
+```
+
+Connect to a network:
+```
+sudo nmcli dev wifi connect "THE_SSID" password "THE_PASSWORD" ifname wlan0
+```
 
 ## How it works
 
