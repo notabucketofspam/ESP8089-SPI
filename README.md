@@ -66,20 +66,17 @@ sudo apt-get -y install linux-headers-$(uname -r) git build-essential
 cd ~
 git clone https://github.com/notabucketofspam/ESP8089-SPI.git
 cd ~/ESP8089-SPI
-make -C /lib/modules/$(uname -r)/build M=$(pwd) clean
-make -C /lib/modules/$(uname -r)/build M=$(pwd) modules
-
+make
 ```
 
 #### Step three: install and configure
 
 ```
-# set the wifi regulatory country code
+# set the wifi regulatory country code (replace US with your 2-letter code)
 sudo raspi-config nonint do_wifi_country US
 
-# put the kernel module where it's supposed to go
-sudo mkdir -p /lib/modules/$(uname -r)/extra
-sudo cp esp8089-spi.ko /lib/modules/$(uname -r)/extra/esp8089-spi.ko
+# install the kernel module and update module dependencies
+sudo make install
 
 # set the config options
 echo "options esp8089-spi esp_reset_gpio=13 esp_cs0_pin=16 esp_interrupt=26" | sudo tee /etc/modprobe.d/esp8089.conf
@@ -87,7 +84,6 @@ echo "dtoverlay=spi1-1cs,cs0_pin=16,cs0_spidev=disabled" | sudo tee -a /boot/fir
 
 # load the module on boot
 echo "esp8089-spi" | sudo tee /etc/modules-load.d/esp8089.conf
-sudo depmod -a
 ```
 
 ... and then `reboot`.
