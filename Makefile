@@ -120,6 +120,7 @@ dkms:
 	-rm $(DKMS_PATH)/*deb
 	dkms add -m $(PACKAGE_NAME) -v $(PACKAGE_VERSION)
 	dkms build -m $(PACKAGE_NAME) -v $(PACKAGE_VERSION)
+	dkms install -m $(PACKAGE_NAME) -v $(PACKAGE_VERSION)
 
 dkmsdeb: dkms
 	dkms mkdsc -m $(PACKAGE_NAME) -v $(PACKAGE_VERSION) --source-only
